@@ -1,0 +1,46 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>LOGIN</h2>
+    <p>Welcome back! Please sign in to continue</p>
+
+    <form (ngSubmit)="loginForm.form.valid && onSubmit()" #loginForm="ngForm" novalidate>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" [(ngModel)]="email" name="email" required placeholder="you@example.com"
+          autocomplete="email" #emailInput="ngModel" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" />
+        <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="error-text"
+          style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+          <div *ngIf="emailInput.errors?.['required']">Email is required.</div>
+          <div *ngIf="emailInput.errors?.['pattern']">Please enter a valid email address.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" [(ngModel)]="password" name="password" required
+          placeholder="Enter your password" autocomplete="current-password" #passwordInput="ngModel" />
+        <div *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)" class="error-text"
+          style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+          Password is required.
+        </div>
+      </div>
+
+      <div *ngIf="successMessage" class="success">
+        {{ successMessage }}
+      </div>
+
+      <div *ngIf="errorMessage" class="error">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="!loginForm.form.valid">
+        Sign In
+      </button>
+
+      <p class="switch-text">
+        New here?
+        <a routerLink="/register">Create an account</a>
+      </p>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,77 @@
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>REGISTER</h2>
+        <p>Create your account to start shopping</p>
+
+        <form (ngSubmit)="registerForm.form.valid && onSubmit()" #registerForm="ngForm" novalidate>
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input id="name" type="text" [(ngModel)]="name" name="name" required minlength="2"
+                    placeholder="John Doe" autocomplete="name" #nameInput="ngModel" />
+                <div *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)" class="error-text"
+                    style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                    <div *ngIf="nameInput.errors?.['required']">Full Name is required.</div>
+                    <div *ngIf="nameInput.errors?.['minlength']">Name must be at least 2 characters long.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" type="email" [(ngModel)]="email" name="email" required placeholder="you@example.com"
+                    autocomplete="email" #emailInput="ngModel" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" />
+                <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="error-text"
+                    style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                    <div *ngIf="emailInput.errors?.['required']">Email is required.</div>
+                    <div *ngIf="emailInput.errors?.['pattern']">Please enter a valid email address.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input id="phoneNumber" type="tel" [(ngModel)]="phoneNumber" name="phoneNumber" required
+                    placeholder="1234567890" autocomplete="tel" #phoneInput="ngModel" pattern="^[0-9]{10}$" />
+                <div *ngIf="phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)" class="error-text"
+                    style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                    <div *ngIf="phoneInput.errors?.['required']">Phone Number is required.</div>
+                    <div *ngIf="phoneInput.errors?.['pattern']">Please enter a valid 10-digit phone number.</div>
+                </div>
+            </div>
+
+            <div class="form-group horizontal">
+                <div class="half" style="width: 100%;">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" [(ngModel)]="password" name="password" required
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                        autocomplete="new-password" #passwordInput="ngModel" />
+                    <div *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)"
+                        class="error-text" style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                        <div *ngIf="passwordInput.errors?.['required']">Password is required.</div>
+                        <div *ngIf="passwordInput.errors?.['pattern']">
+                            Password must meet all requirements:
+                            <ul style="margin: 4px 0 0 16px; padding: 0;">
+                                <li>At least 8 characters</li>
+                                <li>An uppercase letter</li>
+                                <li>A lowercase letter</li>
+                                <li>A number</li>
+                                <li>A special character (@$!%*?&)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="errorMessage" class="error">
+                {{ errorMessage }}
+            </div>
+
+            <button type="submit" class="btn-primary" [disabled]="!registerForm.form.valid">
+                Create Account
+            </button>
+
+            <p class="switch-text">
+                Already have an account?
+                <a routerLink="/login">Login</a>
+            </p>
+        </form>
+    </div>
+</div>

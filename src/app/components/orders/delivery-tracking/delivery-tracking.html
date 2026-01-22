@@ -1,0 +1,119 @@
+<!-- src/app/components/customer/orders/delivery-tracking.html -->
+
+<div class="delivery-tracking" *ngIf="order; else noOrder">
+  <!-- Order Header -->
+  <div class="order-header-card">
+    <div class="order-header-info">
+      <h2 class="order-header-title">Order {{ getOrderId(order) }}</h2>
+      <p class="order-header-date">Placed on {{ order.placedOn | date:'mediumDate' }}</p>
+    </div>
+    <button class="order-status-button" [ngClass]="order.status">
+      {{ order.status }}
+    </button>
+  </div>
+
+  <!-- Product Information -->
+  <div class="order-card product-card" *ngFor="let item of order.items">
+    <div class="product-info-container">
+      <img [src]="item.image || 'assets/images/placeholder.jpg'"
+        (error)="$event.target.src='assets/images/placeholder.jpg'" alt="Product image" class="product-image" />
+      <div class="product-details">
+        <h3 class="product-name">{{ item.name }}</h3>
+        <div class="product-customization">
+          <span class="customization-item">Color: {{ item.color }}</span>
+          <span class="customization-item">Size: {{ item.size }}</span>
+          <span class="customization-item">Material: {{ item.material }}</span>
+        </div>
+      </div>
+      <div class="product-price">₹{{ item.price }}</div>
+    </div>
+  </div>
+
+  <!-- Order Timeline -->
+  <div class="order-card timeline-card">
+    <div class="status-timeline">
+      <div *ngFor="let step of orderSteps" class="status-step" [class.completed]="isStepCompleted(order, step)"
+        [class.current]="isCurrentStatus(order, step)">
+        <div class="status-dot"></div>
+        <div class="status-label">
+          <div class="status-text">{{ step }}</div>
+          <span class="step-icon"><span class="material-symbols-rounded">{{ getStatusIcon(step) }}</span></span>
+          <small *ngIf="isCurrentStatus(order, step)" class="current-status-label">
+            Current Status
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estimated Delivery -->
+  <div class="order-card delivery-card">
+    <div class="delivery-info">
+      <div class="delivery-label">Estimated Delivery</div>
+      <div class="delivery-date">{{ calculateEstimatedDelivery(order) }}</div>
+    </div>
+  </div>
+
+  <!-- Delivery Address -->
+  <div class="order-card address-card" *ngIf="order.deliveryAddress">
+    <h3 class="address-title">Delivery Address</h3>
+    <div class="address-details">
+      <p class="address-line">{{ order.deliveryAddress.street }}</p>
+      <p class="address-line">
+        {{ order.deliveryAddress.city }}, {{ order.deliveryAddress.state }} {{ order.deliveryAddress.zipCode }}
+      </p>
+      <p class="address-line">{{ order.deliveryAddress.country }}</p>
+    </div>
+  </div>
+
+  <!-- Shipment Tracking -->
+  <div class="order-card tracking-card">
+    <h3 class="tracking-title">Shipment Tracking</h3>
+
+    <div class="tracking-row">
+      <div class="tracking-info">
+        <div class="tracking-label">
+          <span class="tracking-icon"><span class="material-symbols-rounded">local_shipping</span></span>
+          Carrier
+        </div>
+        <div class="tracking-value">{{ order.logistics.carrier }}</div>
+      </div>
+      <a *ngIf="order.logistics.trackingId && order.logistics.trackingId !== '-'"
+        [href]="getTrackingUrl(order.logistics.carrier, order.logistics.trackingId)" target="_blank" class="track-link">
+        Track Package
+      </a>
+      <span *ngIf="!order.logistics.trackingId || order.logistics.trackingId === '-'" class="track-link-disabled">
+        Tracking not available
+      </span>
+    </div>
+
+    <div class="tracking-row">
+      <div class="tracking-info">
+        <div class="tracking-label">
+          <span class="tracking-icon"><span class="material-symbols-rounded">location_on</span></span>
+          Current Location
+        </div>
+        <div class="tracking-value">{{ order.logistics.currentLocation }}</div>
+      </div>
+    </div>
+
+    <div class="tracking-row">
+      <div class="tracking-info">
+        <div class="tracking-label">
+          <span class="tracking-icon"><span class="material-symbols-rounded">search</span></span>
+          Tracking ID
+        </div>
+        <div class="tracking-value">{{ order.logistics.trackingId }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #noOrder>
+  <div class="delivery-tracking empty">
+    <div class="empty-box">
+      <div class="empty-icon"><span class="material-symbols-rounded">inventory_2</span></div>
+      <p>No order selected</p>
+    </div>
+  </div>
+</ng-template>

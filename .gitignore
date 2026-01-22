@@ -1,0 +1,47 @@
+# ==============================
+# Java / Spring Boot
+# ==============================
+backend/target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# ==============================
+# Angular / Node
+# ==============================
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
+
+# ==============================
+# Environment & Secrets
+# ==============================
+.env
+application-local.properties
+application-dev.properties
+
+# ==============================
+# IDEs
+# ==============================
+.vscode/
+.idea/
+*.iml
+*.classpath
+*.project
+*.settings/
+
+# ==============================
+# OS Files
+# ==============================
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Build & Cache
+# ==============================
+.cache/
+coverage/

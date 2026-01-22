@@ -1,0 +1,125 @@
+<!-- src/app/components/customer/profile/profile.html -->
+
+<div class="profile-page">
+  <header class="profile-header">
+    <h1>My Profile</h1>
+    <p>Manage your personal information and preferences</p>
+  </header>
+
+  <div *ngIf="isLoading" class="loading">
+    Loading profile...
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && user" class="profile-content">
+    <!-- Personal Information -->
+    <div class="profile-card">
+      <h2 class="card-title">Personal Information</h2>
+
+      <form (ngSubmit)="profileForm.form.valid && onSubmit()" #profileForm="ngForm" class="profile-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input id="name" type="text" [(ngModel)]="user.name" name="name" required minlength="2"
+              placeholder="Your full name" #nameInput="ngModel" />
+            <div *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)" class="error-text"
+              style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+              <div *ngIf="nameInput.errors?.['required']">Name is required.</div>
+              <div *ngIf="nameInput.errors?.['minlength']">Name is too short.</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" type="email" [(ngModel)]="user.email" name="email" required placeholder="you@example.com"
+              readonly style="background-color: #f3f4f6; cursor: not-allowed;" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input id="phoneNumber" type="tel" [(ngModel)]="user.phoneNumber" name="phoneNumber"
+              placeholder="+1 234 567 8900" pattern="^[0-9+ ]{10,15}$" #phoneInput="ngModel" />
+            <div *ngIf="phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)" class="error-text"
+              style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+              Enter a valid phone number.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="dateOfBirth">Date of Birth</label>
+            <input id="dateOfBirth" type="date" [(ngModel)]="user.dateOfBirth" name="dateOfBirth" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" [(ngModel)]="user.gender" name="gender">
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Address Information -->
+        <h2 class="card-title" style="margin-top: 2rem;">Address Information</h2>
+
+        <div class="form-row">
+          <div class="form-group" style="width: 100%;">
+            <label for="street">Street Address</label>
+            <input id="street" type="text" [(ngModel)]="user.address!.street" name="street" placeholder="123 Main St" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City</label>
+            <input id="city" type="text" [(ngModel)]="user.address!.city" name="city" placeholder="City" />
+          </div>
+
+          <div class="form-group">
+            <label for="state">State</label>
+            <input id="state" type="text" [(ngModel)]="user.address!.state" name="state" placeholder="State" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="zipCode">Zip Code</label>
+            <input id="zipCode" type="text" [(ngModel)]="user.address!.zipCode" name="zipCode" placeholder="Zip Code" />
+          </div>
+
+          <div class="form-group">
+            <label for="country">Country</label>
+            <input id="country" type="text" [(ngModel)]="user.address!.country" name="country" placeholder="Country" />
+          </div>
+        </div>
+
+        <div *ngIf="successMessage" class="success-message">
+          {{ successMessage }}
+        </div>
+
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" [disabled]="isSaving || !profileForm.form.valid">
+            {{ isSaving ? 'Saving...' : 'Save Changes' }}
+          </button>
+          <button type="button" class="btn-secondary" (click)="resetForm()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

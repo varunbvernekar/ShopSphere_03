@@ -1,0 +1,196 @@
+<!-- src/app/components/customer/payment/payment.html -->
+
+<div class="payment-page">
+  <header class="payment-header">
+    <h1>Checkout</h1>
+    <p>Complete your order by providing delivery address and payment details</p>
+  </header>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div class="payment-container">
+    <!-- Order Summary -->
+    <div class="order-summary-card">
+      <h2>Order Summary</h2>
+
+      <div class="order-items">
+        <div *ngFor="let item of cartItems" class="order-item">
+          <img [src]="item.image || 'https://via.placeholder.com/150?text=No+Image'" (error)="onImageError($event)"
+            [alt]="item.name" class="item-image" />
+          <div class="item-details">
+            <h3>{{ item.name }}</h3>
+            <!-- Customization removed -->
+            <p class="item-quantity">Quantity: {{ item.quantity }}</p>
+          </div>
+          <div class="item-price">₹{{ (item.price * item.quantity).toFixed(2) }}</div>
+        </div>
+      </div>
+
+      <div class="summary-totals">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>₹{{ subtotal.toFixed(2) }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Tax (10%)</span>
+          <span>₹{{ tax.toFixed(2) }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span>₹{{ shipping.toFixed(2) }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>₹{{ total.toFixed(2) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checkout Form -->
+    <div class="checkout-form-card">
+      <form (ngSubmit)="checkoutForm.form.valid && onSubmit()" #checkoutForm="ngForm" class="checkout-form" novalidate>
+        <!-- Delivery Address Section -->
+        <div class="form-section">
+          <h2 class="section-title">Delivery Address</h2>
+
+          <div class="form-group">
+            <label for="street">Street Address *</label>
+            <input id="street" type="text" [(ngModel)]="address.street" name="street" required minlength="5"
+              placeholder="123 Main Street" #streetInput="ngModel" />
+            <div *ngIf="streetInput.invalid && (streetInput.dirty || streetInput.touched)" class="error-text"
+              style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+              <div *ngIf="streetInput.errors?.['required']">Street address is required.</div>
+              <div *ngIf="streetInput.errors?.['minlength']">Address is too short.</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">City *</label>
+              <input id="city" type="text" [(ngModel)]="address.city" name="city" required placeholder="New York"
+                #cityInput="ngModel" />
+              <div *ngIf="cityInput.invalid && (cityInput.dirty || cityInput.touched)" class="error-text"
+                style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                City is required.
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="state">State/Province *</label>
+              <input id="state" type="text" [(ngModel)]="address.state" name="state" required placeholder="NY"
+                #stateInput="ngModel" />
+              <div *ngIf="stateInput.invalid && (stateInput.dirty || stateInput.touched)" class="error-text"
+                style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                State is required.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="zipCode">Zip/Postal Code *</label>
+              <input id="zipCode" type="text" [(ngModel)]="address.zipCode" name="zipCode" required
+                pattern="^[0-9]{5,6}$" placeholder="10001" #zipInput="ngModel" />
+              <div *ngIf="zipInput.invalid && (zipInput.dirty || zipInput.touched)" class="error-text"
+                style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                <div *ngIf="zipInput.errors?.['required']">Zip code is required.</div>
+                <div *ngIf="zipInput.errors?.['pattern']">Enter a valid 5-6 digit zip code.</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="country">Country *</label>
+              <input id="country" type="text" [(ngModel)]="address.country" name="country" required
+                placeholder="United States" #countryInput="ngModel" />
+              <div *ngIf="countryInput.invalid && (countryInput.dirty || countryInput.touched)" class="error-text"
+                style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                Country is required.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Method Section -->
+        <div class="form-section">
+          <h2 class="section-title">Payment Method</h2>
+
+          <div class="form-group">
+            <label for="paymentMethod">Payment Method *</label>
+            <select id="paymentMethod" [(ngModel)]="paymentMethod" name="paymentMethod" required>
+              <option value="card">Credit/Debit Card</option>
+              <option value="paypal">PayPal</option>
+              <option value="cod">Cash on Delivery</option>
+            </select>
+          </div>
+
+          <div *ngIf="paymentMethod === 'card'" class="card-details">
+            <div class="form-group">
+              <label for="cardNumber">Card Number *</label>
+              <input id="cardNumber" type="text" [(ngModel)]="cardNumber" name="cardNumber"
+                placeholder="1234 5678 9012 3456" maxlength="19" required pattern="^[0-9\s]{16,19}$"
+                #cardNumInput="ngModel" />
+              <div *ngIf="cardNumInput.invalid && (cardNumInput.dirty || cardNumInput.touched)" class="error-text"
+                style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                <div *ngIf="cardNumInput.errors?.['required']">Card number is required.</div>
+                <div *ngIf="cardNumInput.errors?.['pattern']">Enter a valid 16-digit card number.</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="cardName">Cardholder Name *</label>
+              <input id="cardName" type="text" [(ngModel)]="cardName" name="cardName" placeholder="John Doe" required
+                #cardNameInput="ngModel" />
+              <div *ngIf="cardNameInput.invalid && (cardNameInput.dirty || cardNameInput.touched)" class="error-text"
+                style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                Cardholder name is required.
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="cardExpiry">Expiry Date *</label>
+                <input id="cardExpiry" type="text" [(ngModel)]="cardExpiry" name="cardExpiry" placeholder="MM/YY"
+                  maxlength="5" required pattern="^(0[1-9]|1[0-2])\/?([0-9]{2})$" #expiryInput="ngModel" />
+                <div *ngIf="expiryInput.invalid && (expiryInput.dirty || expiryInput.touched)" class="error-text"
+                  style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                  <div *ngIf="expiryInput.errors?.['required']">Expiry required.</div>
+                  <div *ngIf="expiryInput.errors?.['pattern']">Format: MM/YY</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="cardCvv">CVV *</label>
+                <input id="cardCvv" type="text" [(ngModel)]="cardCvv" name="cardCvv" placeholder="123" maxlength="4"
+                  required pattern="^[0-9]{3,4}$" #cvvInput="ngModel" />
+                <div *ngIf="cvvInput.invalid && (cvvInput.dirty || cvvInput.touched)" class="error-text"
+                  style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                  <div *ngIf="cvvInput.errors?.['required']">CVV required.</div>
+                  <div *ngIf="cvvInput.errors?.['pattern']">3-4 digits.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="paymentMethod === 'paypal'" class="payment-info">
+            <p>You will be redirected to PayPal to complete your payment.</p>
+          </div>
+
+          <div *ngIf="paymentMethod === 'cod'" class="payment-info">
+            <p>You will pay cash when the order is delivered.</p>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="onCancel()" [disabled]="isLoading">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="isLoading || !checkoutForm.form.valid">
+            {{ isLoading ? 'Processing...' : 'Place Order' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

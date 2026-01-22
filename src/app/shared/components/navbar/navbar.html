@@ -1,0 +1,52 @@
+<nav class="navbar">
+    <div class="navbar-container">
+        <a routerLink="/" class="navbar-logo">
+            <img src="/assets/images/logo.png" alt="ShopSphere Logo" class="logo-image" />
+            <span class="logo-text">{{ appTitle }}</span>
+        </a>
+
+
+
+        <ul class="navbar-links">
+
+
+            <ng-container *ngIf="!isAdmin">
+                <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+                <li><a routerLink="/products" routerLinkActive="active">Products</a></li>
+                <li><a routerLink="/orders" routerLinkActive="active">Orders</a></li>
+            </ng-container>
+
+            <ng-container *ngIf="isAdmin">
+                <li><a routerLink="/admin" routerLinkActive="active"
+                        [routerLinkActiveOptions]="{exact: true}">Dashboard</a></li>
+                <li><a routerLink="/orders" routerLinkActive="active">Orders</a></li>
+                <li><a routerLink="/admin/add-product" routerLinkActive="active">Add Product</a></li>
+                <li><a routerLink="/admin/customize" routerLinkActive="active">Customize</a></li>
+                <li><a routerLink="/admin/inventory" routerLinkActive="active">Inventory</a></li>
+            </ng-container>
+        </ul>
+
+        <div class="navbar-actions">
+            <ng-container *ngIf="isAdmin">
+                <button class="icon-btn" (click)="openLowStockAlerts()" title="Low Stock Alerts">
+                    <span class="material-symbols-rounded">warning</span>
+                    <span class="badge warning" *ngIf="lowStockCount > 0">{{ lowStockCount }}</span>
+                </button>
+            </ng-container>
+
+            <ng-container *ngIf="!isAdmin">
+
+                <a routerLink="/cart" class="icon-btn" title="Cart">
+                    <span class="material-symbols-rounded">shopping_cart</span>
+                    <span class="badge success" *ngIf="cartCount > 0">{{ cartCount }}</span>
+                </a>
+
+                <a routerLink="/profile" class="icon-btn" title="Profile">
+                    <span class="material-symbols-rounded">person</span>
+                </a>
+            </ng-container>
+
+            <button class="btn-logout" (click)="logout()">Logout</button>
+        </div>
+    </div>
+</nav>

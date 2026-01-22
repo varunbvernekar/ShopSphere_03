@@ -1,0 +1,73 @@
+<div class="cart-page-container">
+    <!-- Empty state -->
+    <div *ngIf="items.length === 0; else cartView" class="cart-root">
+        <h2 class="cart-title">Shopping Cart</h2>
+        <div class="cart-empty-card">
+            <div class="cart-empty-icon"><span class="material-symbols-rounded"
+                    style="font-size: 48px;">shopping_bag</span></div>
+            <h3>Your cart is empty</h3>
+            <p>Discover our unique handmade products and add them to your cart.</p>
+            <a routerLink="/products" class="back-link">
+                <span class="material-symbols-rounded" style="vertical-align: middle;">arrow_back</span> Start Shopping
+            </a>
+        </div>
+    </div>
+
+    <!-- Cart view -->
+    <ng-template #cartView>
+        <div class="cart-root">
+            <div class="cart-header">
+                <h2 class="cart-title">Shopping Cart ({{ items.length }} {{ items.length === 1 ? 'item' : 'items' }})
+                </h2>
+                <button class="continue-btn" routerLink="/products">
+                    <span class="material-symbols-rounded" style="vertical-align: middle;">arrow_back</span> Continue
+                    Shopping
+                </button>
+            </div>
+
+            <div class="cart-grid">
+                <!-- Items -->
+                <div class="cart-items">
+                    <div *ngFor="let item of items" class="cart-item-card">
+                        <img [src]="item.image || 'https://via.placeholder.com/150?text=No+Image'"
+                            (error)="onImageError($event)" [alt]="item.name" class="cart-item-image" />
+                        <div class="cart-item-main">
+                            <div class="cart-item-header">
+                                <div>
+                                    <h3>{{ item.name }}</h3>
+                                    <span class="cart-chip">Product</span>
+                                </div>
+                                <button type="button" (click)="removeItem(item.id)" class="cart-remove"
+                                    aria-label="Remove item">🗑️</button>
+                            </div>
+                            <div class="cart-item-footer">
+                                <div class="cart-qty">
+                                    <button type="button" (click)="updateQty(item.id, item.quantity, -1)">−</button>
+                                    <span>{{ item.quantity }}</span>
+                                    <button type="button" (click)="updateQty(item.id, item.quantity, 1)">+</button>
+                                </div>
+                                <div class="cart-item-price">
+                                    <p class="each">₹{{ item.price.toFixed(2) }} each</p>
+                                    <p class="total">₹{{ (item.price * item.quantity).toFixed(2) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="cart-summary-card">
+                    <h3>Order Summary</h3>
+                    <div class="cart-summary-rows">
+                        <div class="row"><span>Subtotal</span><span>₹{{ subtotal.toFixed(2) }}</span></div>
+                        <div class="row"><span>Tax (10%)</span><span>₹{{ tax.toFixed(2) }}</span></div>
+                        <div class="row"><span>Shipping</span><span>₹{{ shipping.toFixed(2) }}</span></div>
+                    </div>
+                    <div class="cart-summary-total"><span>Total</span><span>₹{{ total.toFixed(2) }}</span></div>
+                    <button type="button" (click)="onCheckout()" class="btn-primary full">💳 Proceed to
+                        Checkout</button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</div>

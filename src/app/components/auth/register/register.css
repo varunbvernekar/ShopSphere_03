@@ -1,0 +1,184 @@
+/* Register Page Styling */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-background);
+    /* Subtle background pattern */
+    background-image:
+        radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--color-primary) 5%, transparent), transparent 40%),
+        radial-gradient(circle at 80% 80%, color-mix(in srgb, var(--color-secondary) 10%, transparent), transparent 40%);
+    padding: 1.5rem;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 500px;
+    background: var(--color-card);
+    color: var(--color-card-foreground);
+    padding: 3rem 2.5rem;
+    border-radius: var(--radius-xl, 1rem);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Header Styling */
+h2 {
+    margin: 0 0 0.5rem 0;
+    text-align: center;
+    font-size: 1.875rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    background: linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+h2+p {
+    text-align: center;
+    color: var(--color-muted-foreground);
+    margin-bottom: 2.5rem;
+    font-size: 0.95rem;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-foreground);
+    margin-left: 0.1rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md, 0.5rem);
+    border: 1px solid var(--color-input);
+    background: var(--color-input-background);
+    color: var(--color-foreground);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px color-mix(in srgb, var(--color-ring) 30%, transparent);
+    background: var(--color-background);
+}
+
+.form-group input::placeholder {
+    color: var(--color-muted-foreground);
+    opacity: 0.7;
+}
+
+/* Horizontal Layout (Password & Confirm) */
+.form-group.horizontal {
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.half {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Error Message */
+.error {
+    background: color-mix(in srgb, var(--color-destructive) 10%, transparent);
+    color: var(--color-destructive);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid color-mix(in srgb, var(--color-destructive) 20%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+}
+
+/* Submit Button */
+.btn-primary {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 0.875rem;
+    border-radius: var(--radius-lg, 0.75rem);
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    background: var(--color-primary);
+    color: var(--color-primary-foreground);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    filter: brightness(110%);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Switch Text (Login Link) */
+.switch-text {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--color-muted-foreground);
+}
+
+.switch-text a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.15s;
+    margin-left: 0.25rem;
+}
+
+.switch-text a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+    .auth-container {
+        padding: 1rem;
+        align-items: flex-start;
+    }
+
+    .auth-card {
+        padding: 2rem 1.5rem;
+        box-shadow: none;
+        border: none;
+        background: transparent;
+    }
+
+    .form-group.horizontal {
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+}

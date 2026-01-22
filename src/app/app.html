@@ -1,0 +1,23 @@
+<!-- src/app/app.html -->
+
+<div class="app-layout" *ngIf="isLoggedIn">
+  <app-navbar [isAdmin]="isAdmin" [lowStockCount]="lowStockCount" [cartCount]="cartCount"
+    (openLowStockAlertsEvent)="openLowStockAlerts()" (logoutEvent)="logout()"></app-navbar>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <app-footer></app-footer>
+</div>
+
+<div *ngIf="!isLoggedIn">
+  <router-outlet></router-outlet>
+  <app-footer></app-footer>
+</div>
+
+<!-- Low Stock Alerts Modal -->
+<app-low-stock-alerts *ngIf="isAdmin" [isOpen]="showLowStockModal"
+  (closeEvent)="closeLowStockAlerts()"></app-low-stock-alerts>
+
+<!-- Customer Notifications Modal -->

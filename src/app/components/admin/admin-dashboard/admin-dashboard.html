@@ -1,0 +1,117 @@
+<!-- src/app/components/admin/admin-dashboard/admin-dashboard.html -->
+
+<div class="dashboard-container">
+
+  <!-- Top metric cards -->
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-icon"><span class="material-symbols-rounded">shopping_bag</span></div>
+      <div class="stat-info">
+        <h3>Total Orders</h3>
+        <p class="stat-value">{{ totalOrders }}</p>
+      </div>
+
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon"><span class="material-symbols-rounded">payments</span></div>
+      <div class="stat-info">
+        <h3>Revenue</h3>
+        <p class="stat-value">₹{{ totalRevenue }}</p>
+      </div>
+
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-icon"><span class="material-symbols-rounded">show_chart</span></div>
+      <div class="stat-info">
+        <h3>Avg Order Value</h3>
+        <p class="stat-value">₹{{ avgOrderValue | number:'1.0-0' }}</p>
+      </div>
+
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-icon"><span class="material-symbols-rounded">inventory_2</span></div>
+      <div class="stat-info">
+        <h3>Active Products</h3>
+        <p class="stat-value">{{ activeProductsCount }}</p>
+      </div>
+    </div>
+    
+    <div class="stat-card red">
+      <div class="stat-icon"><span class="material-symbols-rounded">warning</span></div>
+      <div class="stat-info">
+        <h3>Low Stock Items</h3>
+        <p class="stat-value">{{ lowStockCount }}</p>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Reports Section -->
+  <div class="reports-card">
+    <h2 class="section-title">Reports & Analytics</h2>
+    <div class="reports-filters">
+      <div class="form-row">
+        <label>Start Date</label>
+        <input type="date" [(ngModel)]="reportStartDate" />
+      </div>
+      <div class="form-row">
+        <label>End Date</label>
+        <input type="date" [(ngModel)]="reportEndDate" />
+      </div>
+      <button class="primary-btn" (click)="filterReports()">Filter Reports</button>
+    </div>
+    <div class="report-stats" *ngIf="filteredOrders.length > 0">
+      <div class="report-stat">
+        <span class="report-label">Orders in Period:</span>
+        <span class="report-value">{{ getReportOrderCount() }}</span>
+      </div>
+      <div class="report-stat">
+        <span class="report-label">Revenue in Period:</span>
+        <span class="report-value">₹{{ getReportRevenue() | number:'1.0-0' }}</span>
+      </div>
+    </div>
+
+    <div class="report-table-section" *ngIf="repeatedProductsReport.length > 0"
+      style="margin-top: 24px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Repeated Ordered Products</h3>
+      <div class="table-wrapper">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Times Ordered</th>
+              <th>Total Qty</th>
+              <th>Total Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of repeatedProductsReport">
+              <td>
+                <div class="product-cell" style="display: flex; align-items: center; gap: 12px;">
+                  <img [src]="item.image || 'assets/images/placeholder.jpg'" alt="{{ item.name }}"
+                    style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover; background: #f3f4f6;">
+                  <div class="product-name" style="font-weight: 500;">{{ item.name }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="status-pill healthy" style="background: #eef2ff; color: #4338ca;">
+                  {{ item.timesOrdered }} orders
+                </div>
+              </td>
+              <td style="font-weight: 500;">
+                {{ item.totalQuantity }} units
+              </td>
+              <td style="font-weight: 600;">
+                ₹{{ item.totalRevenue | number:'1.0-0' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+
+</div>

@@ -1,0 +1,70 @@
+<!-- product-page.html -->
+<div class="page-wrapper">
+  <div class="page-container">
+    <ng-container *ngIf="role === 'CUSTOMER'">
+      <ng-container [ngSwitch]="view">
+
+        <!-- CATALOG VIEW -->
+        <div *ngSwitchCase="'catalog'" class="catalog-root">
+          <!-- Filters -->
+          <div class="catalog-filters">
+            <div class="catalog-search-wrapper">
+              <span class="catalog-search-icon"><span class="material-symbols-rounded">search</span></span>
+              <input type="text" placeholder="Search..." [(ngModel)]="searchTerm" (ngModelChange)="onFilterChange()"
+                class="catalog-search-input" />
+            </div>
+            <div class="catalog-category-wrapper">
+              <select [(ngModel)]="selectedCategory" (ngModelChange)="onFilterChange()" class="catalog-category-select">
+                <option *ngFor="let category of categories">{{ category }}</option>
+              </select>
+              <span class="catalog-category-arrow"><span class="material-symbols-rounded">expand_more</span></span>
+            </div>
+          </div>
+
+          <!-- Grid -->
+          <div class="catalog-grid">
+            <button *ngFor="let product of paginatedProducts" type="button" (click)="handleSelectProduct(product)"
+              class="catalog-card" [class.out-of-stock]="isOutOfStock(product)">
+              <div class="catalog-card-image-wrapper">
+                <img [src]="product.previewImage" (error)="onImageError($event)" class="catalog-card-image"
+                  [class.out-of-stock-image]="isOutOfStock(product)" />
+                <div *ngIf="isOutOfStock(product)" class="out-of-stock-badge">Out of Stock</div>
+              </div>
+              <div class="catalog-card-body">
+                <div class="catalog-card-header">
+                  <h3 class="catalog-card-title">{{ product.name }}</h3>
+                  <span class="catalog-card-price">₹{{ product.basePrice }}</span>
+                </div>
+                <div class="catalog-card-footer">
+                  <span *ngIf="product.category" class="catalog-card-chip">{{ product.category }}</span>
+                  <span class="catalog-card-customize">Customize</span>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          <!-- Pagination -->
+          <div class="catalog-pagination" *ngIf="totalPages > 1">
+            <button (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1" class="pagination-btn">
+              <span class="material-symbols-rounded">chevron_left</span> Previous
+            </button>
+            <span class="pagination-info">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="pagination-btn">
+              Next <span class="material-symbols-rounded">chevron_right</span>
+            </button>
+          </div>
+
+          <div *ngIf="paginatedProducts.length === 0" class="catalog-empty">No products found.</div>
+        </div>
+
+        <!-- CUSTOMIZER VIEW -->
+        <ng-container *ngSwitchCase="'customizer'">
+          <app-product-customizer *ngIf="selectedProduct" [product]="selectedProduct" (back)="handleBackToCatalog()"
+            (addToCart)="handleAddToCart($event)">
+          </app-product-customizer>
+        </ng-container>
+
+      </ng-container>
+    </ng-container>
+  </div>
+</div>

@@ -1,0 +1,111 @@
+<div class="customize-container">
+    <div class="header-section">
+        <h1>Customize Products</h1>
+
+    </div>
+
+    <div class="products-grid">
+        <div class="product-card" *ngFor="let p of paginatedProducts">
+            <div class="product-image">
+                <img [src]="p.previewImage || 'assets/images/placeholder.jpg'" [alt]="p.name">
+            </div>
+            <div class="product-details">
+                <h3>{{ p.name }}</h3>
+                <p class="product-id">ID: {{ p.productId }}</p>
+                <div class="options-badge" *ngIf="p.customOptions.length">
+                    {{ p.customOptions.length }} Option Groups
+                </div>
+            </div>
+            <button class="customize-btn" (click)="openEditor(p)">
+                <span class="material-symbols-rounded">tune</span>
+                Customize
+            </button>
+        </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="catalog-pagination" *ngIf="totalPages > 1">
+        <button (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1" class="pagination-btn">
+            <span class="material-symbols-rounded">chevron_left</span>
+            Previous
+        </button>
+
+        <span class="pagination-info">
+            Page {{ currentPage }} of {{ totalPages }}
+        </span>
+
+        <button (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="pagination-btn">
+            Next
+            <span class="material-symbols-rounded">chevron_right</span>
+        </button>
+    </div>
+</div>
+
+<!-- Customization Options Editor Modal -->
+<div class="modal-overlay" *ngIf="selectedProduct" (click)="closeEditor()">
+    <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Customize {{ selectedProduct.name }}</h3>
+            <button class="close-icon" (click)="closeEditor()">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="customization-section new-option-section">
+                <h4>Add New Option Value</h4>
+                <div class="form-row-inline">
+                    <div class="inline-item">
+                        <label>Option Type</label>
+                        <select [(ngModel)]="newOptionType">
+                            <option value="colour">Colour</option>
+                            <option value="size">Size</option>
+                            <option value="material">Material</option>
+                        </select>
+                    </div>
+                    <div class="inline-item">
+                        <label>Value</label>
+                        <input type="text" [(ngModel)]="newOptionValue" placeholder="e.g. Red" />
+                    </div>
+                    <div class="inline-item">
+                        <label>Price Adjustment (₹)</label>
+                        <input type="number" [(ngModel)]="newOptionPrice" placeholder="0" />
+                    </div>
+                    <div class="inline-item button-container">
+                        <button class="primary-btn" (click)="addOptionValue()">
+                            <span class="material-symbols-rounded">add</span>
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="existing-options-container">
+                <div class="customization-section" *ngFor="let option of editingOptions">
+                    <h4>{{ option.type | titlecase }} Options</h4>
+                    <div class="option-values-list">
+                        <div class="option-value-item" *ngFor="let item of option.options">
+                            <div class="value-info">
+                                <span class="value-name">{{ item.label }}</span>
+                                <span class="price-adjustment" *ngIf="item.priceModifier">
+                                    {{ item.priceModifier > 0 ? '+' : '' }}₹{{ item.priceModifier }}
+                                </span>
+                            </div>
+                            <button class="remove-btn" (click)="removeOptionValue(option.type, item.label)">
+                                <span class="material-symbols-rounded">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="no-options" *ngIf="editingOptions.length === 0">
+                    <p>No customization options added yet.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="secondary-btn" (click)="closeEditor()">Cancel</button>
+            <button class="primary-btn" (click)="saveOptions()">Save Changes</button>
+        </div>
+    </div>
+</div>

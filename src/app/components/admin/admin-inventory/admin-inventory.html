@@ -1,0 +1,201 @@
+<!-- src/app/components/admin/admin-inventory/admin-inventory.html -->
+
+<div class="inventory-container">
+  <h1 class="inventory-title">Inventory Management</h1>
+
+  <div class="inventory-summary-cards">
+    <div class="summary-card">
+      <div class="summary-icon blue">📦</div>
+      <div class="summary-info">
+        <h3>Total Products</h3>
+        <p>{{ totalProducts }}</p>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon red">⚠️</div>
+      <div class="summary-info">
+        <h3>Low Stock</h3>
+        <p>{{ lowStockCount }}</p>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon green">💰</div>
+      <div class="summary-info">
+        <h3>Total Value</h3>
+        <p>{{ totalValue | currency:'INR' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="inventory-main-grid">
+    <!-- Inventory table -->
+    <div class="inventory-card">
+      <div class="card-header-row">
+        <h2 class="section-title">Inventory Status</h2>
+
+
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search products..." [(ngModel)]="searchQuery" (input)="onSearchChange()" />
+        </div>
+
+
+
+
+
+        <div class="filter-pills">
+          <button class="filter-btn" [class.active]="statusFilter === 'All'"
+            (click)="onFilterChange('All')">All</button>
+          <button class="filter-btn" [class.active]="statusFilter === 'In Stock'"
+            (click)="onFilterChange('In Stock')">In Stock</button>
+          <button class="filter-btn" [class.active]="statusFilter === 'Low Stock'"
+            (click)="onFilterChange('Low Stock')">Low Stock</button>
+        </div>
+
+      </div>
+
+      <div class="table-wrapper">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Stock Level</th>
+              <th>Reorder Threshold</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of filteredProducts">
+              <td>
+                <div class="product-cell">
+                  <div class="product-name">{{ p.name }}</div>
+                  <div class="product-id">{{ p.productId }}</div>
+                </div>
+              </td>
+              <td>
+                <span class="stock-icon">📦</span>
+                {{ p.stockLevel || 0 }} units
+              </td>
+              <td>
+                {{ p.reorderThreshold || 0 }} units
+              </td>
+              <td>
+                <span [class]="getStatusClass(p)">
+                  {{ getStatusLabel(p) }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons-inline">
+                  <button class="table-btn btn-update" (click)="openStockEditor(p)">Update</button>
+                  <button class="table-btn btn-edit" (click)="openProductEditor(p)">Edit</button>
+                  <button class="table-btn btn-delete" (click)="deleteProduct(p)">Delete</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- Stock Editor Modal -->
+  <div class="modal-overlay" *ngIf="editingStockProduct" (click)="closeStockEditor()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>Manage Stock - {{ editingStockProduct.name }}</h3>
+      <div class="form-row">
+        <label>Stock Level</label>
+        <input type="number" [(ngModel)]="editStockLevel" min="0" required #stockInput="ngModel" />
+        <div *ngIf="stockInput.invalid" class="error-text" style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+          Must be 0 or greater.
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Reorder Threshold</label>
+        <input type="number" [(ngModel)]="editReorderThreshold" min="0" required #threshInput="ngModel" />
+        <div *ngIf="threshInput.invalid" class="error-text" style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+          Must be 0 or greater.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <!-- Manually checking validity since not in a form tag -->
+        <button class="primary-btn" (click)="saveStockChanges()"
+          [disabled]="editStockLevel === null || editStockLevel < 0 || editReorderThreshold === null || editReorderThreshold < 0">
+          Save Stock
+        </button>
+        <button class="secondary-btn" (click)="closeStockEditor()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Details Editor Modal -->
+  <div class="modal-overlay" *ngIf="editingDetailsProduct" (click)="closeProductEditor()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>Edit Product Details - {{ editingDetailsProduct.name }}</h3>
+
+      <!-- Note: Using template variables for manual validation check -->
+      <div class="form-row">
+        <label>Product Name</label>
+        <input type="text" [(ngModel)]="editName" required #editNameInput="ngModel" />
+        <div *ngIf="editNameInput.invalid && (editNameInput.dirty || editNameInput.touched)" class="error-text"
+          style="color: #ef4444; font-size: 12px;">
+          Name is required.
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Description</label>
+        <textarea [(ngModel)]="editDescription" rows="3"
+          style="width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px; font-family: inherit;"></textarea>
+      </div>
+
+      <div class="form-row">
+        <label>Category</label>
+        <input type="text" [(ngModel)]="editCategory" />
+      </div>
+
+      <div class="form-row">
+        <label>Price (₹)</label>
+        <input type="number" [(ngModel)]="editPrice" min="0.01" step="0.01" required #editPriceInput="ngModel" />
+        <div *ngIf="editPriceInput.invalid && (editPriceInput.dirty || editPriceInput.touched)" class="error-text"
+          style="color: #ef4444; font-size: 12px;">
+          Price must be greater than 0.
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Product Image</label>
+        <div class="image-upload-container" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Preview -->
+          <div *ngIf="editImage" class="image-preview"
+            style="width: 100px; height: 100px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f9fafb;">
+            <img [src]="editImage" alt="Preview" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+          </div>
+
+          <!-- File Input -->
+          <input type="file" accept="image/*" (change)="onProductImageSelected($event)" class="file-input" />
+
+          <!-- Fallback URL Input -->
+          <input type="text" [(ngModel)]="editImage" placeholder="Or paste image URL"
+            style="font-size: 12px; color: #6b7280;" />
+        </div>
+      </div>
+
+      <div class="form-row" style="flex-direction: row; align-items: center; gap: 8px; margin-top: 8px;">
+        <input type="checkbox" [(ngModel)]="editActive" id="activeCheck" style="width: auto;" />
+        <label for="activeCheck" style="margin-bottom: 0; cursor: pointer;">Active Product</label>
+      </div>
+
+      <div class="modal-actions">
+        <button class="primary-btn" (click)="saveProductChanges()"
+          [disabled]="!editName || !editPrice || editPrice <= 0">
+          Save Changes
+        </button>
+        <button class="secondary-btn" (click)="closeProductEditor()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+</div>
