@@ -40,6 +40,7 @@ export class Payment implements OnInit {
   cardName = '';
   cardExpiry = '';
   cardCvv = '';
+  upiId = '';
 
   get subtotal(): number {
     return this.cart?.subtotal || 0;
@@ -103,6 +104,11 @@ export class Payment implements OnInit {
     if (this.paymentMethod === 'card') {
       if (!this.cardNumber || !this.cardName || !this.cardExpiry || !this.cardCvv) {
         this.errorMessage = 'Please fill in all payment details.';
+        return;
+      }
+    } else if (this.paymentMethod === 'upi') {
+      if (!this.upiId) {
+        this.errorMessage = 'Please enter a valid UPI ID.';
         return;
       }
     }

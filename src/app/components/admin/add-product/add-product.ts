@@ -47,7 +47,7 @@ export class AdminAddProduct {
             basePrice: Number(this.newProduct.basePrice),
             stockLevel: Number(this.newProduct.stockLevel),
             reorderThreshold: Number(this.newProduct.reorderThreshold),
-            customOptions: DEFAULT_CUSTOM_OPTIONS,
+            customOptions: [], // Using empty options as per user request
             isActive: true
         };
 

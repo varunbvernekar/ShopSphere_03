@@ -120,7 +120,7 @@
             <label for="paymentMethod">Payment Method *</label>
             <select id="paymentMethod" [(ngModel)]="paymentMethod" name="paymentMethod" required>
               <option value="card">Credit/Debit Card</option>
-              <option value="paypal">PayPal</option>
+              <option value="upi">UPI</option>
               <option value="cod">Cash on Delivery</option>
             </select>
           </div>
@@ -173,8 +173,17 @@
             </div>
           </div>
 
-          <div *ngIf="paymentMethod === 'paypal'" class="payment-info">
-            <p>You will be redirected to PayPal to complete your payment.</p>
+          <div *ngIf="paymentMethod === 'upi'" class="payment-info">
+            <div class="form-group">
+              <label for="upiId">UPI ID *</label>
+              <input id="upiId" type="text" [(ngModel)]="upiId" name="upiId" placeholder="username@upi" required
+                #upiInput="ngModel" pattern="^[a-zA-Z0-9.\-_]{2,49}@[a-zA-Z._]{2,49}$" />
+              <div *ngIf="upiInput.invalid && (upiInput.dirty || upiInput.touched)" class="error-text"
+                style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                <div *ngIf="upiInput.errors?.['required']">UPI ID is required.</div>
+                <div *ngIf="upiInput.errors?.['pattern']">Enter a valid UPI ID (e.g., name@upi).</div>
+              </div>
+            </div>
           </div>
 
           <div *ngIf="paymentMethod === 'cod'" class="payment-info">

@@ -28,7 +28,7 @@ export class AdminDashboard implements OnInit {
   totalOrders = 0;
   totalRevenue = 0;
   avgOrderValue = 0;
-  lowStockCount = 0;
+
 
   // Reports
   orders: Order[] = [];
@@ -56,7 +56,7 @@ export class AdminDashboard implements OnInit {
         this.totalOrders = stats.totalOrders;
         this.totalRevenue = stats.totalRevenue;
         this.activeProductsCount = stats.activeProducts;
-        this.lowStockCount = stats.lowStockCount;
+
         this.avgOrderValue = this.totalOrders > 0 ? this.totalRevenue / this.totalOrders : 0;
       },
       error: err => console.error('Failed to load dashboard stats', err)
@@ -64,8 +64,10 @@ export class AdminDashboard implements OnInit {
   }
 
   loadTopSellingProducts(): void {
-    this.dashboardService.getTopSellingProducts().subscribe({
-      next: (data) => this.repeatedProductsReport = data,
+    this.dashboardService.getTopSellingProducts(100).subscribe({
+      next: (data) => {
+        this.repeatedProductsReport = data.filter((item: any) => item.totalQuantity > 5);
+      },
       error: (err) => console.error('Failed to load top selling products', err)
     });
   }

@@ -146,8 +146,9 @@ public class OrderServiceImpl implements OrderService {
                 throw new RuntimeException("Customers can only cancel orders.");
             }
 
-            if (currentStatus != OrderStatus.Placed) {
-                throw new RuntimeException("You can only cancel an order that is still in 'Placed' status.");
+            if (currentStatus != OrderStatus.Placed && currentStatus != OrderStatus.Confirmed
+                    && currentStatus != OrderStatus.Packed) {
+                throw new RuntimeException("You cannot cancel an order that has already been shipped or delivered.");
             }
         } else {
             // ADMIN RULES

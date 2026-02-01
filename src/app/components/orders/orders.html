@@ -12,7 +12,7 @@
     </div>
 
     <!-- CUSTOMER VIEW -->
-    <ng-container *ngIf="!isAdmin && !isLoading && !errorMessage; else adminView">
+    <ng-container *ngIf="!isLoading && !errorMessage">
       <div class="orders-layout" *ngIf="orders.length > 0; else noOrdersCustomer">
         <!-- Left: order list -->
         <aside class="orders-list">
@@ -46,7 +46,8 @@
             <h2>Order #{{ getOrderId(selectedOrder) }}</h2>
             <button class="cancel-btn"
               style="background: #ff4444; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;"
-              *ngIf="selectedOrder.status === 'Confirmed' || selectedOrder.status === 'Packed'"
+              [disabled]="!canCancel(selectedOrder)" [style.opacity]="!canCancel(selectedOrder) ? '0.5' : '1'"
+              [title]="!canCancel(selectedOrder) ? 'Cannot cancel this order' : 'Cancel Order'"
               (click)="cancelOrder(selectedOrder)">
               Cancel Order
             </button>
@@ -75,160 +76,5 @@
       </ng-template>
     </ng-container>
 
-    <!-- ADMIN VIEW -->
-    <ng-template #adminView>
-      <div class="admin-orders" *ngIf="!isLoading && !errorMessage">
-        <h2 class="panel-title">All Customer Orders</h2>
-
-        <div *ngIf="orders.length === 0" class="empty-box">
-          <div class="empty-icon"><span class="material-symbols-rounded">inbox</span></div>
-          <p>No orders placed yet.</p>
-        </div>
-
-        <table *ngIf="orders.length > 0" class="admin-orders-table">
-          <thead>
-            <tr>
-              <th>Order #</th>
-              <th>User ID</th>
-              <th>Placed On</th>
-              <th>Total (₹)</th>
-              <th>Status</th>
-              <th>Carrier</th>
-              <th>Tracking ID</th>
-              <th>Current Location</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let order of orders">
-              <td>#{{ order.id }}</td>
-              <td>{{ order.userId }}</td>
-              <td>{{ order.placedOn | date:'short' }}</td>
-              <td>{{ order.amount }}</td>
-              <td>
-                <select [(ngModel)]="order.status" (change)="onAdminStatusChange(order, order.status)">
-                  <option *ngFor="let step of orderSteps" [value]="step">
-                    {{ step }}
-                  </option>
-                </select>
-              </td>
-              <td>
-                <input type="text" [(ngModel)]="order.logistics.carrier" placeholder="e.g. Shiprocket" />
-              </td>
-              <td>
-                <input type="text" [(ngModel)]="order.logistics.trackingId" placeholder="Tracking ID" />
-              </td>
-              <td>
-                <input type="text" [(ngModel)]="order.logistics.currentLocation" placeholder="Current location" />
-              </td>
-              <td>
-                <div class="action-buttons-inline" style="display: flex; gap: 8px;">
-                  <button type="button" class="admin-action-btn save" (click)="onAdminLogisticsChange(order)"
-                    title="Save Logistics">
-                    Save
-                  </button>
-                  <button type="button" class="admin-action-btn details" (click)="viewAdminOrderDetails(order)">
-                    Details
-                  </button>
-                  <button type="button" class="admin-action-btn cancel" *ngIf="isAdminOrderCancellable(order)"
-                    (click)="cancelOrder(order)" title="Cancel Order">
-                    <span class="material-symbols-rounded">cancel</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Admin Order Details Modal -->
-        <div class="modal-overlay" *ngIf="selectedAdminOrder" (click)="closeAdminOrderDetails()"
-          style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-          <div class="modal-content" (click)="$event.stopPropagation()"
-            style="background: white; border-radius: 12px; padding: 24px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;">
-
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
-              <div>
-                <h3 style="margin: 0; font-size: 20px;">Order #{{ selectedAdminOrder.id }}</h3>
-                <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">Placed on {{ selectedAdminOrder.placedOn |
-                  date:'medium' }}
-                  by User #{{ selectedAdminOrder.userId }}</p>
-              </div>
-              <div class="status-pill" [ngClass]="selectedAdminOrder.status"
-                style="padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 500; text-transform: uppercase;">
-                {{ selectedAdminOrder.status }}
-              </div>
-            </div>
-
-            <div style="display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;">
-              <div style="flex: 1; min-width: 200px;">
-                <h4
-                  style="margin: 0 0 8px; font-size: 14px; text-transform: uppercase; color: #6b7280; font-weight: 600;">
-                  Delivery Address</h4>
-                <div class="address-box"
-                  style="background: #f9fafb; padding: 12px; border-radius: 8px; font-size: 14px;">
-                  <ng-container *ngIf="selectedAdminOrder.deliveryAddress; else noAddress">
-                    <div>{{ selectedAdminOrder.deliveryAddress.street }}</div>
-                    <div>{{ selectedAdminOrder.deliveryAddress.city }}, {{ selectedAdminOrder.deliveryAddress.state }}
-                      {{
-                      selectedAdminOrder.deliveryAddress.zipCode }}</div>
-                    <div>{{ selectedAdminOrder.deliveryAddress.country }}</div>
-                  </ng-container>
-                  <ng-template #noAddress>
-                    <p style="color: #9ca3af; font-style: italic;">No address provided</p>
-                  </ng-template>
-                </div>
-              </div>
-
-              <div style="flex: 1; min-width: 200px;">
-                <h4
-                  style="margin: 0 0 8px; font-size: 14px; text-transform: uppercase; color: #6b7280; font-weight: 600;">
-                  Payment Info</h4>
-                <div class="payment-box"
-                  style="background: #f9fafb; padding: 12px; border-radius: 8px; font-size: 14px;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <span>Subtotal</span>
-                    <span>₹{{ selectedAdminOrder.amount }}</span>
-                  </div>
-                  <div
-                    style="display: flex; justify-content: space-between; font-weight: 600; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 4px;">
-                    <span>Total Paid</span>
-                    <span>₹{{ selectedAdminOrder.amount }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <h4 style="margin: 0 0 12px; font-size: 14px; text-transform: uppercase; color: #6b7280; font-weight: 600;">
-              Order Items</h4>
-            <div class="order-items-list"
-              style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-bottom: 24px;">
-              <div *ngFor="let item of selectedAdminOrder.items"
-                style="display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #e5e7eb; gap: 12px;">
-                <img [src]="item.image || 'assets/images/placeholder.jpg'"
-                  (error)="$event.target.src='assets/images/placeholder.jpg'" alt="{{ item.name }}"
-                  style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; background: #f3f4f6;">
-                <div style="flex: 1;">
-                  <div style="font-weight: 500;">{{ item.name }}</div>
-                  <div style="font-size: 12px; color: #6b7280;">
-                    Qty: {{ item.quantity }} | {{ item.color }} | {{ item.size }}
-                  </div>
-                </div>
-                <div style="font-weight: 500;">₹{{ item.price * item.quantity }}</div>
-              </div>
-            </div>
-
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-              <button *ngIf="isAdminOrderCancellable(selectedAdminOrder)"
-                (click)="cancelOrder(selectedAdminOrder); closeAdminOrderDetails()"
-                style="background: #fee2e2; color: #b91c1c; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer;">
-                Cancel Order
-              </button>
-              <button (click)="closeAdminOrderDetails()"
-                style="background: #f3f4f6; color: #374151; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer;">
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ng-template>
+  </header>
+</div>

@@ -65,7 +65,8 @@ export class ProductPage implements OnInit {
     let filtered = this.products.filter(p => {
       const matchesCategory = this.selectedCategory === 'All' || p.category === this.selectedCategory;
       const matchesSearch = !term || p.name.toLowerCase().includes(term) || (p.description?.toLowerCase().includes(term) ?? false);
-      return matchesCategory && matchesSearch;
+      const isActive = p.isActive !== false; // Default to true if undefined
+      return matchesCategory && matchesSearch && isActive;
     });
 
     return filtered.sort((a, b) => { // High stock first

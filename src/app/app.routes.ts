@@ -25,6 +25,8 @@ export const routes: Routes = [
   { path: 'payment', component: Payment, canActivate: [authGuard] },
   { path: 'admin', component: AdminDashboard, canActivate: [adminGuard] },
   { path: 'admin/inventory', component: AdminInventory, canActivate: [adminGuard] },
+  { path: 'admin/orders', loadComponent: () => import('./components/admin/admin-orders/admin-orders').then(m => m.AdminOrders), canActivate: [adminGuard] }, // New route
+  { path: 'admin/products', loadComponent: () => import('./components/admin/admin-product/admin-product').then(m => m.AdminProduct), canActivate: [adminGuard] },
   { path: 'admin/add-product', loadComponent: () => import('./components/admin/add-product/add-product').then(m => m.AdminAddProduct), canActivate: [adminGuard] },
   { path: 'admin/customize', loadComponent: () => import('./components/admin/customize-product/customize-product').then(m => m.CustomizeProduct), canActivate: [adminGuard] },
   { path: '**', redirectTo: '' }

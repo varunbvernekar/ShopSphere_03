@@ -1,0 +1,161 @@
+<div class="admin-orders-page">
+    <div class="header-section">
+        <h1>Manage Customer Orders</h1>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-state">
+        Loading orders...
+    </div>
+    <div *ngIf="!isLoading && errorMessage" class="error-state">
+        {{ errorMessage }}
+    </div>
+
+    <div class="admin-orders-content" *ngIf="!isLoading && !errorMessage">
+        <div *ngIf="orders.length === 0" class="empty-state">
+            <span class="material-symbols-rounded icon">inbox</span>
+            <p>No orders placed yet.</p>
+        </div>
+
+        <div class="table-container" *ngIf="orders.length > 0">
+            <table class="admin-orders-table">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>User ID</th>
+                        <th>Placed On</th>
+                        <th>Total (₹)</th>
+                        <th>Status</th>
+                        <th>Carrier</th>
+                        <th>Tracking ID</th>
+                        <th>Current Location</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let order of orders">
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.userId }}</td>
+                        <td>{{ order.placedOn | date:'short' }}</td>
+                        <td>{{ order.amount }}</td>
+                        <td>
+                            <ng-container
+                                *ngIf="order.status === 'Cancelled' || order.status === 'Delivered'; else statusDropdown">
+                                <span class="status-badge" [ngClass]="order.status">{{ order.status }}</span>
+                            </ng-container>
+                            <ng-template #statusDropdown>
+                                <select [(ngModel)]="order.status" (change)="onAdminStatusChange(order, order.status)"
+                                    class="status-select">
+                                    <option *ngFor="let step of orderSteps" [value]="step">
+                                        {{ step }}
+                                    </option>
+                                </select>
+                            </ng-template>
+                        </td>
+                        <td>
+                            <input type="text" [(ngModel)]="order.logistics.carrier" placeholder="e.g. Shiprocket"
+                                class="input-field" />
+                        </td>
+                        <td>
+                            <input type="text" [(ngModel)]="order.logistics.trackingId" placeholder="Tracking ID"
+                                class="input-field" />
+                        </td>
+                        <td>
+                            <input type="text" [(ngModel)]="order.logistics.currentLocation"
+                                placeholder="Current location" class="input-field" />
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button type="button" class="btn-save" (click)="onAdminLogisticsChange(order)"
+                                    title="Save Logistics">
+                                    Save
+                                </button>
+                                <button type="button" class="btn-details" (click)="viewAdminOrderDetails(order)">
+                                    Details
+                                </button>
+                                <button type="button" class="btn-cancel" *ngIf="isAdminOrderCancellable(order)"
+                                    (click)="cancelOrder(order)" title="Cancel Order">
+                                    <span class="material-symbols-rounded">cancel</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Admin Order Details Modal -->
+        <div class="modal-overlay" *ngIf="selectedAdminOrder" (click)="closeAdminOrderDetails()">
+            <div class="modal-content" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <div>
+                        <h3>Order #{{ selectedAdminOrder.id }}</h3>
+                        <p class="subtitle">Placed on {{ selectedAdminOrder.placedOn | date:'medium' }} by User #{{
+                            selectedAdminOrder.userId }}</p>
+                    </div>
+                    <div class="status-badge" [ngClass]="selectedAdminOrder.status">
+                        {{ selectedAdminOrder.status }}
+                    </div>
+                </div>
+
+                <div class="modal-body">
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Delivery Address</h4>
+                            <div class="address-box">
+                                <ng-container *ngIf="selectedAdminOrder.deliveryAddress; else noAddress">
+                                    <div>{{ selectedAdminOrder.deliveryAddress.street }}</div>
+                                    <div>{{ selectedAdminOrder.deliveryAddress.city }}, {{
+                                        selectedAdminOrder.deliveryAddress.state }} {{
+                                        selectedAdminOrder.deliveryAddress.zipCode }}</div>
+                                    <div>{{ selectedAdminOrder.deliveryAddress.country }}</div>
+                                </ng-container>
+                                <ng-template #noAddress>
+                                    <p class="italic-text">No address provided</p>
+                                </ng-template>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <h4>Payment Info</h4>
+                            <div class="payment-box">
+                                <div class="row">
+                                    <span>Subtotal</span>
+                                    <span>₹{{ selectedAdminOrder.amount }}</span>
+                                </div>
+                                <div class="row total">
+                                    <span>Total Paid</span>
+                                    <span>₹{{ selectedAdminOrder.amount }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="section-title">Order Items</h4>
+                    <div class="order-items-list">
+                        <div *ngFor="let item of selectedAdminOrder.items" class="order-item">
+                            <img [src]="item.image || 'assets/images/placeholder.jpg'"
+                                (error)="$event.target.src='assets/images/placeholder.jpg'" alt="{{ item.name }}"
+                                class="item-thumb">
+                            <div class="item-details">
+                                <div class="item-name">{{ item.name }}</div>
+                                <div class="item-meta">Qty: {{ item.quantity }} | {{ item.color }} | {{ item.size }}
+                                </div>
+                            </div>
+                            <div class="item-price">₹{{ item.price * item.quantity }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button *ngIf="isAdminOrderCancellable(selectedAdminOrder)"
+                        (click)="cancelOrder(selectedAdminOrder); closeAdminOrderDetails()" class="btn-danger">
+                        Cancel Order
+                    </button>
+                    <button (click)="closeAdminOrderDetails()" class="btn-secondary">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

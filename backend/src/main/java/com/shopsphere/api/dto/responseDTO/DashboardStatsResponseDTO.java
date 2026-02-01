@@ -10,5 +10,4 @@ public class DashboardStatsResponseDTO {
     private Double totalRevenue;
     private Long totalProducts;
     private Long activeProducts;
-    private Long lowStockCount;
 }

@@ -35,14 +35,8 @@
         <p class="stat-value">{{ activeProductsCount }}</p>
       </div>
     </div>
-    
-    <div class="stat-card red">
-      <div class="stat-icon"><span class="material-symbols-rounded">warning</span></div>
-      <div class="stat-info">
-        <h3>Low Stock Items</h3>
-        <p class="stat-value">{{ lowStockCount }}</p>
-      </div>
-    </div>
+
+
   </div>
 
 
@@ -74,29 +68,27 @@
 
     <div class="report-table-section" *ngIf="repeatedProductsReport.length > 0"
       style="margin-top: 24px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
-      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Repeated Ordered Products</h3>
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Most Purchased Products by Rank</h3>
       <div class="table-wrapper">
         <table class="inventory-table">
           <thead>
             <tr>
+              <th>Rank</th>
               <th>Product</th>
-              <th>Times Ordered</th>
               <th>Total Qty</th>
               <th>Total Revenue</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of repeatedProductsReport">
+            <tr *ngFor="let item of repeatedProductsReport; let i = index">
+              <td>
+                <span style="font-weight: 600; color: #6b7280; margin-left: 8px;">#{{ i + 1 }}</span>
+              </td>
               <td>
                 <div class="product-cell" style="display: flex; align-items: center; gap: 12px;">
                   <img [src]="item.image || 'assets/images/placeholder.jpg'" alt="{{ item.name }}"
                     style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover; background: #f3f4f6;">
                   <div class="product-name" style="font-weight: 500;">{{ item.name }}</div>
-                </div>
-              </td>
-              <td>
-                <div class="status-pill healthy" style="background: #eef2ff; color: #4338ca;">
-                  {{ item.timesOrdered }} orders
                 </div>
               </td>
               <td style="font-weight: 500;">

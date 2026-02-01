@@ -7,7 +7,6 @@ export interface DashboardStats {
     totalRevenue: number;
     totalProducts: number;
     activeProducts: number;
-    lowStockCount: number;
 }
 
 export interface ProductSales {

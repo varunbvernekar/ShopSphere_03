@@ -21,9 +21,7 @@ export class OrdersPage implements OnInit {
 
   orders: Order[] = [];
   selectedOrder: Order | null = null;
-  selectedAdminOrder: Order | null = null;
 
-  isAdmin = false;
   currentUser: User | null = null;
   isLoading = false;
   errorMessage = '';
@@ -34,19 +32,15 @@ export class OrdersPage implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // 1. Identify User Role (Admin vs Customer)
+    // 1. Identify User Role
     this.currentUser = this.authService.getCurrentUser();
     if (this.currentUser?.id) {
-      this.isAdmin = this.currentUser.role === 'ADMIN';
       this.loadOrders();
     }
   }
 
   /**
-   * Fetches orders based on role.
-   * Admin -> All Orders.
-   * Customer -> Only their orders.
-   * Logic is enforced by Backend Security (OrderController).
+   * Fetches orders for the current user.
    */
   private loadOrders(): void {
     if (!this.currentUser?.id) return;
@@ -54,11 +48,7 @@ export class OrdersPage implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const request$ = this.isAdmin
-      ? this.orderService.getAllOrders()
-      : this.orderService.getOrdersForUser(this.currentUser.id);
-
-    request$.subscribe({
+    this.orderService.getOrdersForUser(this.currentUser.id).subscribe({
       next: (orders) => {
         this.orders = orders;
         this.isLoading = false;
@@ -73,16 +63,20 @@ export class OrdersPage implements OnInit {
   // --- Customer Actions ---
 
   selectOrder(order: Order): void {
-    if (!this.isAdmin) this.selectedOrder = order;
+    this.selectedOrder = order;
   }
 
   /**
    * Requests order cancellation.
    * Backend (OrderServiceImpl) enforces rules:
-   * - Customer can only cancel 'Placed' orders.
+   * - Customer can only cancel 'Placed', 'Confirmed', or 'Packed' orders.
    * - Stock is automatically restored.
    */
   cancelOrder(order: Order): void {
+    if (!this.canCancel(order)) {
+      alert('This order cannot be cancelled.');
+      return;
+    }
     if (!order.id || !confirm('Cancel this order?')) return;
 
     this.orderService.cancelOrder(order.id).subscribe({
@@ -94,54 +88,6 @@ export class OrdersPage implements OnInit {
     });
   }
 
-  // --- Admin Actions ---
-
-  viewAdminOrderDetails(order: Order): void {
-    this.selectedAdminOrder = order;
-  }
-
-  closeAdminOrderDetails(): void {
-    this.selectedAdminOrder = null;
-  }
-
-  /**
-   * Updates status (e.g., Placed -> Confirmed).
-   * Backend validates allowed transitions.
-   */
-  isAdminOrderCancellable(order: Order): boolean {
-    return order.status === 'Confirmed' || order.status === 'Packed';
-  }
-
-  onAdminStatusChange(order: Order, newStatus: OrderStatus): void {
-    if (!order.id) return;
-
-    // Optimistic update or wait for result? 
-    // Here we wait to ensure backend allows it.
-    const originalStatus = order.status;
-    order.status = newStatus; // UI optimism
-
-    this.orderService.updateOrder(order).subscribe({
-      next: (updated) => this.updateLocalOrder(updated),
-      error: (err) => {
-        order.status = originalStatus; // Revert on failure
-        alert(err.error?.message || 'Update failed');
-      }
-    });
-  }
-
-  /**
-   * Updates logistics (Tracking ID, Carrier).
-   */
-  onAdminLogisticsChange(order: Order): void {
-    if (!order.id) return;
-    this.orderService.updateLogistics(order.id, order.logistics).subscribe({
-      next: (updated) => {
-        this.updateLocalOrder(updated);
-        alert('Logistics updated.');
-      },
-      error: () => alert('Failed to update logistics')
-    });
-  }
 
   // --- Helpers ---
 
@@ -163,6 +109,10 @@ export class OrdersPage implements OnInit {
       'Delivered': 'check_circle'
     };
     return icons[status] || 'assignment';
+  }
+
+  canCancel(order: Order): boolean {
+    return order.status !== 'Shipped' && order.status !== 'Delivered' && order.status !== 'Cancelled';
   }
 
   getOrderId(order: Order): string {

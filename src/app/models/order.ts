@@ -1,6 +1,6 @@
 // src/app/models/order.ts
 
-export type OrderStatus = 'Placed' | 'Processing' | 'Confirmed' | 'Packed' | 'Shipped' | 'Delivered' | 'Cancelled';
+export type OrderStatus = 'Confirmed' | 'Packed' | 'Shipped' | 'Delivered' | 'Cancelled';
 
 export interface OrderItem {
   productId: string;
