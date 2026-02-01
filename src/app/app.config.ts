@@ -18,10 +18,10 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
 
-    // ✅ routing
+    // routing
     provideRouter(routes),
 
-    // ✅ HTTP + interceptor (class-based)
+    // HTTP + interceptor (class-based)
     provideHttpClient(withFetch(), withInterceptorsFromDi()),
     {
       provide: HTTP_INTERCEPTORS,

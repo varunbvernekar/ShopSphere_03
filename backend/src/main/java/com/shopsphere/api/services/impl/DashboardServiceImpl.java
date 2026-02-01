@@ -6,8 +6,10 @@ import com.shopsphere.api.entity.Product;
 import com.shopsphere.api.repositories.OrderRepository;
 import com.shopsphere.api.repositories.ProductRepository;
 
+import com.shopsphere.api.dto.responseDTO.ProductSalesDTO;
 import com.shopsphere.api.services.DashboardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,8 +38,6 @@ public class DashboardServiceImpl implements DashboardService {
                                 .filter(p -> Boolean.TRUE.equals(p.getIsActive()))
                                 .count();
 
-                // low stock count logic removed as per requirement
-
                 return DashboardStatsResponseDTO.builder()
                                 .totalOrders(totalOrders)
                                 .totalRevenue(totalRevenue)
@@ -47,7 +47,7 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         @Override
-        public java.util.List<com.shopsphere.api.dto.responseDTO.ProductSalesDTO> getTopSellingProducts(int limit) {
-                return orderRepository.findTopSellingProducts(org.springframework.data.domain.PageRequest.of(0, limit));
+        public List<ProductSalesDTO> getTopSellingProducts(int limit) {
+                return orderRepository.findTopSellingProducts(PageRequest.of(0, limit));
         }
 }

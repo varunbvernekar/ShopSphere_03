@@ -9,10 +9,11 @@ import java.util.Optional;
 public interface UserService {
     Optional<User> findByEmail(String email);
 
-    UserResponseDTO registerUser(User user); // Controller converts Request -> Entity for now, or change?
+    UserResponseDTO registerUser(RegisterRequestDTO request);
     // Let's keep consistency with earlier step where controller mapped.
     // Actually, `registerUser` in Controller currently maps DTO->Entity.
-    // Let's stick to that for now to minimize churn, OR use RegisterRequestDTO here?
+    // Let's stick to that for now to minimize churn, OR use RegisterRequestDTO
+    // here?
     // Interface in step 123 was 'UserDTO registerUser(User user)'.
 
     Optional<User> authenticate(String email, String password);

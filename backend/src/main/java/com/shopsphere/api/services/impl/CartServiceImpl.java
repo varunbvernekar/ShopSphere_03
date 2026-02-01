@@ -14,9 +14,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.shopsphere.api.services.InventoryService;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +29,7 @@ public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
-    private final com.shopsphere.api.services.InventoryService inventoryService;
+    private final InventoryService inventoryService;
 
     @Override
     @Transactional
@@ -37,7 +41,7 @@ public class CartServiceImpl implements CartService {
 
     private void syncCartPrices(Cart cart) {
         boolean changed = false;
-        java.util.Iterator<CartItem> iterator = cart.getItems().iterator();
+        Iterator<CartItem> iterator = cart.getItems().iterator();
 
         while (iterator.hasNext()) {
             CartItem item = iterator.next();
@@ -87,9 +91,9 @@ public class CartServiceImpl implements CartService {
 
         Optional<CartItem> existingItem = cart.getItems().stream()
                 .filter(item -> item.getProductId().equals(request.getProductId()) &&
-                        java.util.Objects.equals(item.getColor(), request.getColor()) &&
-                        java.util.Objects.equals(item.getSize(), request.getSize()) &&
-                        java.util.Objects.equals(item.getMaterial(), request.getMaterial()))
+                        Objects.equals(item.getColor(), request.getColor()) &&
+                        Objects.equals(item.getSize(), request.getSize()) &&
+                        Objects.equals(item.getMaterial(), request.getMaterial()))
                 .findFirst();
 
         int currentCartQuantity = existingItem.map(CartItem::getQuantity).orElse(0);

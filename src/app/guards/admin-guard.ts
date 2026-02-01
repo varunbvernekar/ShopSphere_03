@@ -13,6 +13,5 @@ export const adminGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // Not an admin → send to login
   return router.parseUrl('/login');
 };

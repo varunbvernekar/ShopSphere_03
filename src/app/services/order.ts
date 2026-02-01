@@ -27,10 +27,6 @@ export class OrderService {
     return this.http.put<Order>(`${this.apiUrl}/orders/${order.id}`, order);
   }
 
-  updateLogistics(orderId: number, logistics: any): Observable<Order> {
-    return this.http.put<Order>(`${this.apiUrl}/delivery/${orderId}/logistics`, logistics);
-  }
-
   cancelOrder(orderId: number): Observable<Order> {
     return this.http.put<Order>(`${this.apiUrl}/orders/${orderId}/status`, { status: 'Cancelled' });
   }

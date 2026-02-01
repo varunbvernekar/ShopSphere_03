@@ -45,22 +45,7 @@ export class ProductService {
     return this.http.delete<void>(`${this.apiUrl}/products/${productId}`);
   }
 
-  updateStock(productId: string, stockLevel: number): Observable<Product> {
-    return this.http.put<Product>(`${this.apiUrl}/products/${productId}/stock`, { stockLevel }).pipe(
-      map(p => this.normalizeProduct(p))
-    );
-  }
 
-  updateReorderThreshold(productId: string, reorderThreshold: number): Observable<Product> {
-    // Assuming backend handles partial updates or we fetch-modify-save
-    // For now keeping it simple as before but cleaner
-    return this.getProductById(productId).pipe(
-      switchMap(product => {
-        if (!product) throw new Error('Product not found');
-        return this.updateProduct({ ...product, reorderThreshold });
-      })
-    );
-  }
 
   private normalizeProduct(p: Product): Product {
     return {

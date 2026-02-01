@@ -33,7 +33,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         // Automatically move to Shipped if tracking info is added and status is still
         // Placed/Processing
-        if (order.getStatus() == OrderStatus.Placed || order.getStatus() == OrderStatus.Processing) {
+        if (order.getStatus() == OrderStatus.Placed) {
             order.setStatus(OrderStatus.Shipped);
         }
 

@@ -5,9 +5,6 @@ import { User, Address } from '../../models/user';
 import { AuthService } from '../../services/auth';
 import { UserService } from '../../services/user';
 
-/**
- * Component for viewing and editing user profile information.
- */
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -32,21 +29,10 @@ export class Profile implements OnInit {
     this.loadProfile();
   }
 
-  /**
-   * Loads the current user's profile data from the server.
-   */
   loadProfile(): void {
     const currentUser = this.authService.getCurrentUser();
 
-    // During SSR or initial load, user might be null. 
-    // We shouldn't error out, just show loading or empty state until client hydration.
     if (!currentUser || !currentUser.id) {
-      // Optionally check if we are on server to differentiate "not logged in" vs "server render"
-      // But simpler is to stricter check in logic
-      // For now, if no user, we can't load profile.
-      // However, we shouldn't show "User not found" error immediately if it's just SSR waiting for hydration.
-      // Let's return and stay in "isLoading" false (or true?) state.
-      // Actually, best is to just return and let the view handle null user (which it likely does with *ngIf or empty fields)
       return;
     }
 
@@ -56,7 +42,6 @@ export class Profile implements OnInit {
 
     this.userService.getUser(currentUser.id).subscribe({
       next: user => {
-        // Initialize all missing fields with default values
         const completeUser: User = {
           ...user,
           phoneNumber: user.phoneNumber || '',
@@ -72,7 +57,7 @@ export class Profile implements OnInit {
         };
 
         this.user = completeUser;
-        this.originalUser = JSON.parse(JSON.stringify(completeUser)); // Deep copy
+        this.originalUser = JSON.parse(JSON.stringify(completeUser));
         this.isLoading = false;
       },
       error: err => {
@@ -81,7 +66,6 @@ export class Profile implements OnInit {
           this.isLoading = false;
           return;
         }
-        // If user doesn't exist in db, try to use current user from auth
         if (err.status === 404) {
           const currentUser = this.authService.getCurrentUser();
           if (currentUser) {
@@ -103,9 +87,6 @@ export class Profile implements OnInit {
     });
   }
 
-  /**
-   * Handles profile update form submission.
-   */
   onSubmit(): void {
     if (!this.user || !this.user.id) {
       this.errorMessage = 'User data is invalid.';
@@ -116,7 +97,6 @@ export class Profile implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Ensure all fields are properly initialized before saving
     const userToSave: User = {
       ...this.user,
       phoneNumber: this.user.phoneNumber || '',
@@ -126,7 +106,6 @@ export class Profile implements OnInit {
 
     this.userService.updateUser(userToSave).subscribe({
       next: updatedUser => {
-        // Ensure all fields are initialized in the response
         const completeUser: User = {
           ...updatedUser,
           phoneNumber: updatedUser.phoneNumber || '',
@@ -141,14 +120,12 @@ export class Profile implements OnInit {
           }
         };
 
-        // Update the current user in auth service
         this.authService.updateCurrentUser(completeUser);
         this.user = completeUser;
         this.originalUser = JSON.parse(JSON.stringify(completeUser));
         this.successMessage = 'Profile updated successfully!';
         this.isSaving = false;
 
-        // Clear success message after 3 seconds
         setTimeout(() => {
           this.successMessage = '';
         }, 3000);
@@ -173,4 +150,3 @@ export class Profile implements OnInit {
     }
   }
 }
-

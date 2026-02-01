@@ -1,4 +1,4 @@
-// src/app/components/customer/product-page/product-page.ts
+
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -69,7 +69,7 @@ export class ProductPage implements OnInit {
       return matchesCategory && matchesSearch && isActive;
     });
 
-    return filtered.sort((a, b) => { // High stock first
+    return filtered.sort((a, b) => {
       const aStock = (a.stockLevel ?? 1) > 0;
       const bStock = (b.stockLevel ?? 1) > 0;
       return (aStock === bStock) ? 0 : (aStock ? -1 : 1);
@@ -109,14 +109,14 @@ export class ProductPage implements OnInit {
   }
 
   handleAddToCart(event: { product: Product; customization: any; price: number }): void {
-    if (!this.isStockAvailable(event.product)) return alert('Product out of stock');
+    if (!this.isStockAvailable(event.product)) return;
 
     this.cartService.addToCart(event.product.productId!, 1, event.customization).subscribe({
       next: () => {
-        alert('Added to cart!');
+        console.log('Added to cart');
         this.handleBackToCatalog();
       },
-      error: () => alert('Failed to add to cart.')
+      error: () => console.error('Failed to add to cart.')
     });
   }
 

@@ -48,10 +48,8 @@ export class Login implements OnInit {
           const user = this.authService.getCurrentUser();
 
           if (user?.role === 'ADMIN') {
-            // Admin → go to dashboard
             this.router.navigate(['/admin']);
           } else {
-            // Customer (and others like VENDOR) → go to products
             this.router.navigate(['/products']);
           }
         } else {

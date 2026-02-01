@@ -96,15 +96,6 @@ export class AdminProduct implements OnInit {
     saveChanges(): void {
         if (!this.editingProduct) return;
 
-        // We only update the fields we are editing.
-        // Note: We are preserving the existing customOptions and image since we don't edit them here
-        // based on "no images" requirement for the table, but the user didn't explicitly say "no image editing".
-        // I will include image editing in the modal if I want to be thorough, but maybe just stick to the text fields as implied by the simplified requirements.
-        // The user said "show all the products without any images as a table format".
-        // I will stick to text-based editing to keep it clean, unless I should allow image text URL editing?
-        // I'll leave image editing out for simplicity unless strictly needed, updating Name/Category/Price/Desc is usually key.
-        // Actually, I'll include the Image URL field just in case they want to fix a broken link, but no file upload complexity.
-
         const updatedProduct: Product = {
             ...this.editingProduct,
             name: this.editName,

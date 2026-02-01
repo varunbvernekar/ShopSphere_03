@@ -11,12 +11,8 @@ export class DeliveryService {
 
   constructor(private http: HttpClient) { }
 
-  updateLogistics(orderId: number, carrier: string, trackingId: string, currentLocation: string): Observable<Order> {
-    return this.http.put<Order>(`${this.apiUrl}/${orderId}/logistics`, {
-      carrier,
-      trackingId,
-      currentLocation
-    });
+  updateLogistics(orderId: number, logistics: any): Observable<Order> {
+    return this.http.put<Order>(`${this.apiUrl}/${orderId}/logistics`, logistics);
   }
 
   updateStatus(orderId: number, status: string): Observable<Order> {

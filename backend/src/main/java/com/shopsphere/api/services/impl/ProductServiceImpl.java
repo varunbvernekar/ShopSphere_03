@@ -1,6 +1,7 @@
 package com.shopsphere.api.services.impl;
 
 import com.shopsphere.api.dto.requestDTO.ProductRequestDTO;
+import com.shopsphere.api.dto.requestDTO.StockUpdateRequestDTO;
 import com.shopsphere.api.dto.responseDTO.ProductResponseDTO;
 import com.shopsphere.api.entity.Product;
 import com.shopsphere.api.repositories.ProductRepository;
@@ -61,7 +62,15 @@ public class ProductServiceImpl implements ProductService {
         } else {
             log.warn("No custom options received in request");
         }
-        Product product = ProductRequestDTO.toEntity(productRequest);
+        Product product = Product.builder()
+                .name(productRequest.getName())
+                .description(productRequest.getDescription())
+                .category(productRequest.getCategory())
+                .basePrice(productRequest.getBasePrice())
+                .previewImage(productRequest.getPreviewImage())
+                .customOptions(productRequest.getCustomOptions())
+                .isActive(productRequest.getIsActive())
+                .build();
 
         String generatedId = "P" + System.currentTimeMillis();
         product.setProductId(generatedId);
@@ -92,7 +101,15 @@ public class ProductServiceImpl implements ProductService {
                     return new RuntimeException("Product not found");
                 });
 
-        Product updatedState = ProductRequestDTO.toEntity(productRequest);
+        Product updatedState = Product.builder()
+                .name(productRequest.getName())
+                .description(productRequest.getDescription())
+                .category(productRequest.getCategory())
+                .basePrice(productRequest.getBasePrice())
+                .previewImage(productRequest.getPreviewImage())
+                .customOptions(productRequest.getCustomOptions())
+                .isActive(productRequest.getIsActive())
+                .build();
         updatedState.setProductId(id);
 
         Product savedProduct = productRepository.save(updatedState);
@@ -100,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
         // Update inventory if provided in request?
         if (productRequest.getStockLevel() != null || productRequest.getReorderThreshold() != null) {
             log.info("Updating inventory for product ID: {}", id);
-            var stockReq = new com.shopsphere.api.dto.requestDTO.StockUpdateRequestDTO();
+            var stockReq = new StockUpdateRequestDTO();
             stockReq.setQuantity(productRequest.getStockLevel());
             stockReq.setThreshold(productRequest.getReorderThreshold());
             inventoryService.updateInventory(id, stockReq);

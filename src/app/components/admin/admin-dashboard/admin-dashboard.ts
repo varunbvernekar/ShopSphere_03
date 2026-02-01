@@ -82,7 +82,7 @@ export class AdminDashboard implements OnInit {
     });
   }
 
-  // Reports logic remains client-side for now
+
   filterReports(): void {
     if (!this.reportStartDate || !this.reportEndDate) {
       alert('Please select both start and end dates');

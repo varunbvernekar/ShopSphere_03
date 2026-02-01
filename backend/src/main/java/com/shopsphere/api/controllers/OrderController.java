@@ -54,7 +54,8 @@ public class OrderController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> updateOrder(@PathVariable Long id, @RequestBody OrderRequestDTO orderRequest) {
+    public ResponseEntity<OrderResponseDTO> updateOrder(@PathVariable Long id,
+            @RequestBody OrderRequestDTO orderRequest) {
         log.info("Admin updating order ID: {}", id);
         return ResponseEntity.ok(orderService.updateOrder(id, orderRequest));
     }

@@ -11,9 +11,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.shopsphere.api.entity.Cart;
+import com.shopsphere.api.entity.LogisticsInfo;
+import com.shopsphere.api.entity.OrderItem;
+import com.shopsphere.api.entity.User;
+import com.shopsphere.api.repositories.CartRepository;
+import com.shopsphere.api.repositories.UserRepository;
+import com.shopsphere.api.services.CartService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 @RequiredArgsConstructor
@@ -21,15 +32,15 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final InventoryService inventoryService;
-    private final com.shopsphere.api.repositories.CartRepository cartRepository;
-    private final com.shopsphere.api.repositories.UserRepository userRepository;
-    private final com.shopsphere.api.services.CartService cartService;
+    private final CartRepository cartRepository;
+    private final UserRepository userRepository;
+    private final CartService cartService;
 
     @Override
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO orderRequest) {
         Long userId = orderRequest.getUserId();
-        com.shopsphere.api.entity.Cart cart = cartRepository.findByUserId(userId)
+        Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found for user"));
 
         if (cart.getItems().isEmpty()) {
@@ -39,14 +50,14 @@ public class OrderServiceImpl implements OrderService {
         // Create Order from Cart
         Order.OrderBuilder orderBuilder = Order.builder()
                 .userId(userId)
-                .placedOn(java.time.LocalDateTime.now())
+                .placedOn(LocalDateTime.now())
                 .status(OrderStatus.Placed) // Default status
                 .estimatedDelivery(orderRequest.getEstimatedDelivery())
                 .deliveryAddress(orderRequest.getDeliveryAddress());
 
         // Map Cart Items to Order Items
-        List<com.shopsphere.api.entity.OrderItem> orderItems = cart.getItems().stream()
-                .map(cartItem -> com.shopsphere.api.entity.OrderItem.builder()
+        List<OrderItem> orderItems = cart.getItems().stream()
+                .map(cartItem -> OrderItem.builder()
                         .productId(cartItem.getProductId())
                         .name(cartItem.getName())
                         .image(cartItem.getImage())
@@ -72,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
 
         // Logistics (if provided, though typically empty at creation)
         if (orderRequest.getLogistics() != null) {
-            orderBuilder.logistics(com.shopsphere.api.entity.LogisticsInfo.builder()
+            orderBuilder.logistics(LogisticsInfo.builder()
                     .carrier(orderRequest.getLogistics().getCarrier())
                     .trackingId(orderRequest.getLogistics().getTrackingId())
                     .currentLocation(orderRequest.getLogistics().getCurrentLocation())
@@ -126,7 +137,7 @@ public class OrderServiceImpl implements OrderService {
         OrderStatus currentStatus = order.getStatus();
 
         // Security Check
-        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+        Authentication auth = SecurityContextHolder
                 .getContext().getAuthentication();
 
         boolean isAdmin = auth.getAuthorities().stream()
@@ -135,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
         if (!isAdmin) {
             // CUSTOMER RULES
             String email = auth.getName();
-            com.shopsphere.api.entity.User user = userRepository.findByEmail(email)
+            User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             if (!order.getUserId().equals(user.getId())) {
@@ -226,9 +237,21 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if (orderRequest.getItems() != null) {
-            Order tempOrder = OrderRequestDTO.toEntity(orderRequest);
+            List<OrderItem> newItems = orderRequest.getItems().stream()
+                    .map(itemDTO -> OrderItem.builder()
+                            .productId(itemDTO.getProductId())
+                            .name(itemDTO.getName())
+                            .image(itemDTO.getImage())
+                            .quantity(itemDTO.getQuantity())
+                            .color(itemDTO.getColor())
+                            .size(itemDTO.getSize())
+                            .material(itemDTO.getMaterial())
+                            .price(itemDTO.getPrice())
+                            .build())
+                    .collect(Collectors.toList());
+
             existing.getItems().clear();
-            existing.getItems().addAll(tempOrder.getItems());
+            existing.getItems().addAll(newItems);
         }
 
         // REMOVED: Logistics update logic. Use DeliveryService for this.

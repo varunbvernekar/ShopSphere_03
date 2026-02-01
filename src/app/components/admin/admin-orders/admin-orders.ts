@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Order, OrderStatus } from '../../../models/order';
 import { OrderService } from '../../../services/order';
+import { DeliveryService } from '../../../services/delivery';
 
 @Component({
     selector: 'app-admin-orders',
@@ -19,7 +20,10 @@ export class AdminOrders implements OnInit {
     errorMessage = '';
     orderSteps: OrderStatus[] = ['Confirmed', 'Packed', 'Shipped', 'Delivered'];
 
-    constructor(private orderService: OrderService) { }
+    constructor(
+        private orderService: OrderService,
+        private deliveryService: DeliveryService
+    ) { }
 
     ngOnInit(): void {
         this.loadOrders();
@@ -49,7 +53,7 @@ export class AdminOrders implements OnInit {
     }
 
     isAdminOrderCancellable(order: Order): boolean {
-        return order.status === 'Confirmed' || order.status === 'Packed';
+        return order.status === 'Placed' || order.status === 'Confirmed' || order.status === 'Packed';
     }
 
     onAdminStatusChange(order: Order, newStatus: OrderStatus): void {
@@ -68,7 +72,7 @@ export class AdminOrders implements OnInit {
 
     onAdminLogisticsChange(order: Order): void {
         if (!order.id) return;
-        this.orderService.updateLogistics(order.id, order.logistics).subscribe({
+        this.deliveryService.updateLogistics(order.id, order.logistics).subscribe({
             next: (updated) => {
                 this.updateLocalOrder(updated);
                 alert('Logistics updated.');

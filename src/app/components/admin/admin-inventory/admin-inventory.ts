@@ -1,4 +1,4 @@
-// src/app/components/admin/admin-inventory/admin-inventory.ts
+
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';

@@ -36,7 +36,7 @@ export class CustomizeProduct implements OnInit {
         });
     }
 
-    // Pagination
+
     get paginatedProducts(): Product[] {
         const start = (this.currentPage - 1) * this.itemsPerPage;
         return this.products.slice(start, start + this.itemsPerPage);

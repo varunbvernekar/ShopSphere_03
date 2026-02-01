@@ -20,18 +20,12 @@ public class AuthController {
     private final UserService userService;
     private final com.shopsphere.api.security.JwtUtils jwtUtils;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponseDTO> register(@RequestBody RegisterRequestDTO request) {
+    public ResponseEntity<UserResponseDTO> register(@RequestBody RegisterRequestDTO request) {
         log.info("Received registration request for email: {}", request.getEmail());
-        User userEntity = mapToEntity(request);
-        UserResponseDTO createdUser = userService.registerUser(userEntity);
+        UserResponseDTO createdUser = userService.registerUser(request);
 
-        String token = jwtUtils.generateToken(createdUser.getEmail());
         log.info("User registered successfully: {}", createdUser.getEmail());
-        return ResponseEntity.ok(AuthResponseDTO.builder()
-                .token(token)
-                .user(createdUser)
-                .build());
+        return ResponseEntity.ok(createdUser);
     }
 
     @PostMapping("/login")
@@ -52,16 +46,4 @@ public class AuthController {
                 });
     }
 
-    private User mapToEntity(RegisterRequestDTO req) {
-        return User.builder()
-                .name(req.getName())
-                .email(req.getEmail())
-                .password(req.getPassword())
-                .phoneNumber(req.getPhoneNumber())
-                .address(req.getAddress())
-                .role(com.shopsphere.api.enums.UserRole.CUSTOMER)
-                .gender(req.getGender())
-                .dateOfBirth(req.getDateOfBirth())
-                .build();
-    }
 }

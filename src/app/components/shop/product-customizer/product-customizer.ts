@@ -63,8 +63,8 @@ export class ProductCustomizer implements OnInit {
   }
 
   handleAddToCart(): void {
-    if (!this.isInStock) {
-      alert(`${this.product.name} is out of stock.`);
+    if (this.product.stockLevel === 0) {
+      console.log(`${this.product.name} is out of stock.`);
       return;
     }
 

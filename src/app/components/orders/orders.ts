@@ -74,17 +74,17 @@ export class OrdersPage implements OnInit {
    */
   cancelOrder(order: Order): void {
     if (!this.canCancel(order)) {
-      alert('This order cannot be cancelled.');
+      console.log('This order cannot be cancelled.');
       return;
     }
-    if (!order.id || !confirm('Cancel this order?')) return;
+    if (!confirm('Are you sure you want to cancel this order?')) return;
 
-    this.orderService.cancelOrder(order.id).subscribe({
-      next: (updated) => {
-        this.updateLocalOrder(updated);
-        alert('Order cancelled.');
+    this.orderService.cancelOrder(order.id!).subscribe({
+      next: (updatedOrder) => {
+        console.log('Order cancelled.');
+        this.updateLocalOrder(updatedOrder);
       },
-      error: (err) => alert(err.error?.message || 'Failed to cancel order')
+      error: (err) => console.error(err.error?.message || 'Failed to cancel order')
     });
   }
 

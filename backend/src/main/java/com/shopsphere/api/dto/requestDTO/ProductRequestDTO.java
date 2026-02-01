@@ -1,7 +1,7 @@
 package com.shopsphere.api.dto.requestDTO;
 
 import com.shopsphere.api.entity.CustomOptionGroup;
-import com.shopsphere.api.entity.Product;
+
 import lombok.Data;
 
 import java.util.List;
@@ -25,18 +25,4 @@ public class ProductRequestDTO {
     private Integer reorderThreshold;
     private Boolean isActive;
 
-    public static Product toEntity(ProductRequestDTO request) {
-        if (request == null) {
-            return null;
-        }
-        return Product.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .category(request.getCategory())
-                .basePrice(request.getBasePrice())
-                .previewImage(request.getPreviewImage())
-                .customOptions(request.getCustomOptions())
-                .isActive(request.getIsActive())
-                .build();
-    }
 }

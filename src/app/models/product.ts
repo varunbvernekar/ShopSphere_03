@@ -1,6 +1,4 @@
-// src/app/models/product.ts
 
-// OPTION TYPES MUST MATCH EXISTING COMPONENT CODE
 export type CustomOptionType = 'colour' | 'size' | 'material';
 
 export interface CustomOptionItem {
@@ -23,8 +21,8 @@ export interface Product {
 
   customOptions: CustomOptionGroup[];
 
-  // 🔹 Inventory fields for admin dashboard
-  stockLevel?: number;        // current stock
-  reorderThreshold?: number;  // threshold for low-stock alert
-  isActive?: boolean;         // can hide products later if needed
+
+  stockLevel?: number;
+  reorderThreshold?: number;
+  isActive?: boolean;
 }

@@ -128,31 +128,24 @@ export class Payment implements OnInit {
     estimated.setDate(today.getDate() + 7);
     const estimatedDelivery = estimated.toLocaleDateString('en-IN');
 
-    // Backend will fetch items from Cart and calculate amount.
-    // We send minimal required fields.
     const payload: Omit<Order, 'id'> = {
       userId: user.id,
       placedOn,
-      amount: 0, // Ignored by backend
+      amount: 0,
       status: 'Confirmed' as OrderStatus,
-      items: [], // Ignored by backend
+      items: [],
       estimatedDelivery,
       logistics: {
         carrier: 'Not assigned',
         trackingId: '-',
-        currentLocation: 'Order confirmed'
+        currentLocation: 'Not Available'
       },
       deliveryAddress: { ...this.address }
     };
 
     this.orderService.createOrder(payload).subscribe({
       next: () => {
-        // Backend handles inventory updates and cart clearing
-        // We just need to refresh local cart state (which is done via clearCart usually, but let's just navigate)
-        // Ideally, we should call cartService.getCart() to see empty state, or rely on the fact that we are navigating away.
-        // Actually, backend clears the cart. We should locally clear too to update UI immediately?
-        // App component subscribes to cart$. 
-        this.cartService.clearCart().subscribe(); // Sync frontend state
+        this.cartService.clearCart().subscribe();
         this.router.navigate(['/orders']);
       },
       error: err => {
@@ -162,8 +155,6 @@ export class Payment implements OnInit {
       }
     });
   }
-
-  /* Inventory update moved to backend */
 
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;

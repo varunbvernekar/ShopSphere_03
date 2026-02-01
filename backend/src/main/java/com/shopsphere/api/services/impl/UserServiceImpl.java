@@ -1,5 +1,11 @@
 package com.shopsphere.api.services.impl;
 
+import com.shopsphere.api.dto.requestDTO.RegisterRequestDTO;
+import com.shopsphere.api.enums.UserRole;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.shopsphere.api.dto.requestDTO.UserUpdateRequestDTO;
 import com.shopsphere.api.dto.responseDTO.UserResponseDTO;
 import com.shopsphere.api.entity.User;
@@ -16,7 +22,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Optional<User> findByEmail(String email) {
@@ -25,12 +31,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDTO registerUser(User user) {
-        log.info("Attempting to register user with email: {}", user.getEmail());
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            log.warn("Registration failed: Email {} already taken", user.getEmail());
+    public UserResponseDTO registerUser(RegisterRequestDTO request) {
+        log.info("Attempting to register user with email: {}", request.getEmail());
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            log.warn("Registration failed: Email {} already taken", request.getEmail());
             throw new RuntimeException("Email already taken");
         }
+
+        // Map DTO to Entity
+        User user = User.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .password(request.getPassword()) // Will be encoded below
+                .phoneNumber(request.getPhoneNumber())
+                .address(request.getAddress())
+                .role(UserRole.CUSTOMER)
+                .gender(request.getGender())
+                .dateOfBirth(request.getDateOfBirth())
+                .build();
 
         // Encode password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -68,7 +86,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkAccess(User targetUser) {
-        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+        Authentication auth = SecurityContextHolder
                 .getContext().getAuthentication();
 
         // If system call or anonymous (shouldn't happen due to security filter),
