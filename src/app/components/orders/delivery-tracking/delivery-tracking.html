@@ -20,9 +20,9 @@
       <div class="product-details">
         <h3 class="product-name">{{ item.name }}</h3>
         <div class="product-customization">
-          <span class="customization-item">Color: {{ item.color }}</span>
-          <span class="customization-item">Size: {{ item.size }}</span>
-          <span class="customization-item">Material: {{ item.material }}</span>
+          <span class="customization-item" *ngIf="item.color">Color: {{ item.color }}</span>
+          <span class="customization-item" *ngIf="item.size">Size: {{ item.size }}</span>
+          <span class="customization-item" *ngIf="item.material">Material: {{ item.material }}</span>
         </div>
       </div>
       <div class="product-price">₹{{ item.price }}</div>

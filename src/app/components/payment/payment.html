@@ -21,7 +21,11 @@
             [alt]="item.name" class="item-image" />
           <div class="item-details">
             <h3>{{ item.name }}</h3>
-            <!-- Customization removed -->
+            <div class="item-customization" style="font-size: 0.85rem; color: #666; margin-bottom: 4px;">
+              <span *ngIf="item.color" style="margin-right: 8px;">Color: {{ item.color }}</span>
+              <span *ngIf="item.size" style="margin-right: 8px;">Size: {{ item.size }}</span>
+              <span *ngIf="item.material">Material: {{ item.material }}</span>
+            </div>
             <p class="item-quantity">Quantity: {{ item.quantity }}</p>
           </div>
           <div class="item-price">₹{{ (item.price * item.quantity).toFixed(2) }}</div>

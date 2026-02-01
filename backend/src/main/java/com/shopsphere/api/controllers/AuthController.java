@@ -20,6 +20,7 @@ public class AuthController {
     private final UserService userService;
     private final com.shopsphere.api.security.JwtUtils jwtUtils;
 
+    @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@RequestBody RegisterRequestDTO request) {
         log.info("Received registration request for email: {}", request.getEmail());
         UserResponseDTO createdUser = userService.registerUser(request);

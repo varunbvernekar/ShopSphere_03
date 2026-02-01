@@ -13,9 +13,9 @@
 
       <div class="customizer-summary">
         <h4>Your Customization</h4>
-        <p>Color: {{ selectedColor || '–' }}</p>
-        <p>Size: {{ selectedSize || '–' }}</p>
-        <p>Material: {{ selectedMaterial || '–' }}</p>
+        <p *ngIf="colourOptions.length">Color: {{ selectedColor }}</p>
+        <p *ngIf="sizeOptions.length">Size: {{ selectedSize }}</p>
+        <p *ngIf="materialOptions.length">Material: {{ selectedMaterial }}</p>
       </div>
     </div>
 

@@ -35,7 +35,14 @@
                             <div class="cart-item-header">
                                 <div>
                                     <h3>{{ item.name }}</h3>
-                                    <span class="cart-chip">Product</span>
+
+                                    <div class="cart-customization"
+                                        style="font-size: 0.85rem; color: #666; margin-top: 4px;">
+                                        <span *ngIf="item.color" style="margin-right: 8px;">Color: {{ item.color
+                                            }}</span>
+                                        <span *ngIf="item.size" style="margin-right: 8px;">Size: {{ item.size }}</span>
+                                        <span *ngIf="item.material">Material: {{ item.material }}</span>
+                                    </div>
                                 </div>
                                 <button type="button" (click)="removeItem(item.id)" class="cart-remove"
                                     aria-label="Remove item">🗑️</button>

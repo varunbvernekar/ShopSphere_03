@@ -19,6 +19,8 @@ export class Register {
   phoneNumber = '';
   password = '';
   confirmPassword = '';
+  dateOfBirth = '';
+  gender = '';
 
   errorMessage = '';
 
@@ -48,8 +50,8 @@ export class Register {
         zipCode: '',
         country: ''
       },
-      dateOfBirth: '',
-      gender: '',
+      dateOfBirth: this.dateOfBirth ? this.dateOfBirth : undefined,
+      gender: this.gender ? this.gender : undefined,
     };
 
     this.authService.register(user).subscribe({
@@ -62,8 +64,12 @@ export class Register {
           this.errorMessage = 'A user with this email already exists.';
         }
       },
-      error: () => {
-        this.errorMessage = 'Something went wrong during registration.';
+      error: (err) => {
+        if (err.error && err.error.message) {
+          this.errorMessage = err.error.message;
+        } else {
+          this.errorMessage = 'Something went wrong during registration.';
+        }
       }
     });
   }
