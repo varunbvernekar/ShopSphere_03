@@ -1,9 +1,9 @@
 package com.shopsphere.api.controllers;
 
 import com.shopsphere.api.dto.requestDTO.LogisticsInfoRequestDTO;
-import com.shopsphere.api.dto.requestDTO.OrderStatusUpdateRequestDTO;
+
 import com.shopsphere.api.dto.responseDTO.OrderResponseDTO;
-import com.shopsphere.api.enums.OrderStatus;
+
 import com.shopsphere.api.services.DeliveryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +27,4 @@ public class DeliveryController {
         return ResponseEntity.ok(deliveryService.updateLogistics(orderId, request));
     }
 
-    @PutMapping("/{orderId}/status")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<OrderResponseDTO> updateDeliveryStatus(@PathVariable Long orderId,
-            @RequestBody OrderStatusUpdateRequestDTO request) {
-        log.info("Updating delivery status for order ID: {} to {}", orderId, request.getStatus());
-        return ResponseEntity.ok(deliveryService.updateStatus(orderId, request.getStatus()));
-    }
 }

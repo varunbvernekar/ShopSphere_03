@@ -1,6 +1,5 @@
 package com.shopsphere.api.controllers;
 
-import com.shopsphere.api.enums.OrderStatus;
 import com.shopsphere.api.dto.requestDTO.OrderRequestDTO;
 import com.shopsphere.api.dto.responseDTO.OrderResponseDTO;
 import com.shopsphere.api.entity.User;
@@ -9,7 +8,6 @@ import com.shopsphere.api.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -44,20 +42,8 @@ public class OrderController {
             return ResponseEntity.ok(orderService.getOrdersByUserId(user.getId()));
         }
 
-        if (userId != null) {
-            log.info("Admin fetching orders for specific user ID: {}", userId);
-            return ResponseEntity.ok(orderService.getOrdersByUserId(userId));
-        }
         log.info("Admin fetching all orders");
         return ResponseEntity.ok(orderService.getAllOrders());
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> updateOrder(@PathVariable Long id,
-            @RequestBody OrderRequestDTO orderRequest) {
-        log.info("Admin updating order ID: {}", id);
-        return ResponseEntity.ok(orderService.updateOrder(id, orderRequest));
     }
 
     @PutMapping("/{id}/status")
@@ -65,5 +51,11 @@ public class OrderController {
             @RequestBody com.shopsphere.api.dto.requestDTO.OrderStatusUpdateRequestDTO request) {
         log.info("Updating status for order ID: {} to {}", id, request.getStatus());
         return ResponseEntity.ok(orderService.updateOrderStatus(id, request.getStatus()));
+    }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<OrderResponseDTO> cancelOrder(@PathVariable Long id) {
+        log.info("Canceling order ID: {}", id);
+        return ResponseEntity.ok(orderService.cancelOrder(id));
     }
 }

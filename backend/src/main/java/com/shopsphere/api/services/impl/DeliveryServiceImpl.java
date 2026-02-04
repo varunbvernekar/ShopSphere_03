@@ -31,8 +31,6 @@ public class DeliveryServiceImpl implements DeliveryService {
         order.getLogistics().setTrackingId(request.getTrackingId());
         order.getLogistics().setCurrentLocation(request.getCurrentLocation());
 
-        // Automatically move to Shipped if tracking info is added and status is still
-        // Placed/Processing
         if (order.getStatus() == OrderStatus.Placed) {
             order.setStatus(OrderStatus.Shipped);
         }
@@ -41,21 +39,4 @@ public class DeliveryServiceImpl implements DeliveryService {
         return OrderResponseDTO.fromEntity(savedOrder);
     }
 
-    @Override
-    @Transactional
-    public OrderResponseDTO updateStatus(Long orderId, OrderStatus status) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        // Only allow delivery-related status updates (e.g., Shipped, Delivered)
-        // Cancellation is handled by OrderService (Customer/Admin)
-        if (status == OrderStatus.Cancelled) {
-            throw new RuntimeException("Use OrderService to cancel orders.");
-        }
-
-        order.setStatus(status);
-
-        Order savedOrder = orderRepository.save(order);
-        return OrderResponseDTO.fromEntity(savedOrder);
-    }
 }

@@ -1,12 +1,11 @@
 
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { InventoryService } from '../../../services/inventory';
-import { ProductService } from '../../../services/product';
 import { Product } from '../../../models/product';
+
 
 @Component({
   selector: 'app-admin-inventory',
@@ -30,10 +29,6 @@ export class AdminInventory implements OnInit {
     return this.products.filter(p => this.isLowStock(p)).length;
   }
 
-  get totalValue(): number {
-    return this.products.reduce((sum, p) => sum + (p.basePrice * (p.stockLevel || 0)), 0);
-  }
-
   // Inventory editing (Stock & Threshold)
   editingStockProduct: Product | null = null;
   editStockLevel = 0;
@@ -41,8 +36,7 @@ export class AdminInventory implements OnInit {
 
 
   constructor(
-    private inventoryService: InventoryService,
-    private productService: ProductService
+    private inventoryService: InventoryService
   ) { }
 
   ngOnInit(): void {
@@ -50,13 +44,18 @@ export class AdminInventory implements OnInit {
   }
 
   refreshData(): void {
-    this.inventoryService.getProducts().subscribe({
-      next: products => {
-        this.products = products;
+    this.inventoryService.getAllInventory().subscribe({
+      next: (inventory) => {
+        this.products = inventory.map(item => ({
+          productId: item.productId,
+          name: item.productName,
+          stockLevel: item.quantity,
+          reorderThreshold: item.reorderThreshold
+        } as any));
         this.filterProducts();
       },
       error: err => {
-        console.error('Failed to load products in admin inventory', err);
+        console.error('Failed to load inventory data', err);
       }
     });
   }

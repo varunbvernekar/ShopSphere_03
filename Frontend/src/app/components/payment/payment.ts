@@ -132,7 +132,7 @@ export class Payment implements OnInit {
       userId: user.id,
       placedOn,
       amount: 0,
-      status: 'Confirmed' as OrderStatus,
+      status: 'Placed' as OrderStatus,
       items: [],
       estimatedDelivery,
       logistics: {

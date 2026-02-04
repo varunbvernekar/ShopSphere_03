@@ -15,9 +15,7 @@ export class DeliveryService {
     return this.http.put<Order>(`${this.apiUrl}/${orderId}/logistics`, logistics);
   }
 
-  updateStatus(orderId: number, status: string): Observable<Order> {
-    return this.http.put<Order>(`${this.apiUrl}/${orderId}/status`, { status });
-  }
+
 
   getTrackingUrl(carrier: string, trackingId: string): string {
     const c = carrier.toLowerCase();

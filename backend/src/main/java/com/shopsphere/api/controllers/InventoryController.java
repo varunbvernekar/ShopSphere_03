@@ -17,9 +17,15 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
+    @GetMapping
+    public ResponseEntity<java.util.List<InventoryResponseDTO>> getInventory() {
+        log.info("Fetching all inventory");
+        return ResponseEntity.ok(inventoryService.getAllInventory());
+    }
+
     @GetMapping("/{productId}")
     public ResponseEntity<InventoryResponseDTO> getInventory(@PathVariable String productId) {
-        log.debug("Fetching inventory for product ID: {}", productId);
+        log.info("Fetching inventory for product ID: {}", productId);
         return ResponseEntity.ok(inventoryService.getInventory(productId));
     }
 

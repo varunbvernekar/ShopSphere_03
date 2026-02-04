@@ -41,11 +41,11 @@ public class Order {
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "street", column = @Column(name = "delivery_street")),
-        @AttributeOverride(name = "city", column = @Column(name = "delivery_city")),
-        @AttributeOverride(name = "state", column = @Column(name = "delivery_state")),
-        @AttributeOverride(name = "zipCode", column = @Column(name = "delivery_zip_code")),
-        @AttributeOverride(name = "country", column = @Column(name = "delivery_country"))
+            @AttributeOverride(name = "street", column = @Column(name = "delivery_street")),
+            @AttributeOverride(name = "city", column = @Column(name = "delivery_city")),
+            @AttributeOverride(name = "state", column = @Column(name = "delivery_state")),
+            @AttributeOverride(name = "zipCode", column = @Column(name = "delivery_zip_code")),
+            @AttributeOverride(name = "country", column = @Column(name = "delivery_country"))
     })
     private Address deliveryAddress;
 }

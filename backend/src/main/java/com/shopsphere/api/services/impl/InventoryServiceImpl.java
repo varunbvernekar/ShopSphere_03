@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
+    private final com.shopsphere.api.repositories.ProductRepository productRepository;
 
     @Override
     public InventoryResponseDTO getInventory(String productId) {
@@ -24,6 +25,13 @@ public class InventoryServiceImpl implements InventoryService {
                         .reorderThreshold(0)
                         .build());
         return mapToResponse(inventory);
+    }
+
+    @Override
+    public java.util.List<InventoryResponseDTO> getAllInventory() {
+        return inventoryRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Override
@@ -94,10 +102,9 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     private InventoryResponseDTO mapToResponse(Inventory inventory) {
-        return InventoryResponseDTO.builder()
-                .productId(inventory.getProductId())
-                .quantity(inventory.getQuantity())
-                .reorderThreshold(inventory.getReorderThreshold())
-                .build();
+        String productName = productRepository.findById(inventory.getProductId())
+                .map(com.shopsphere.api.entity.Product::getName)
+                .orElse("Unknown Product");
+        return InventoryResponseDTO.fromEntity(inventory, productName);
     }
 }

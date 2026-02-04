@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Order } from '../models/order';
 
 @Injectable({
@@ -23,11 +23,11 @@ export class OrderService {
     return this.http.post<Order>(`${this.apiUrl}/orders`, order);
   }
 
-  updateOrder(order: Order): Observable<Order> {
-    return this.http.put<Order>(`${this.apiUrl}/orders/${order.id}`, order);
+  updateOrderStatus(orderId: number, status: string): Observable<Order> {
+    return this.http.put<Order>(`${this.apiUrl}/orders/${orderId}/status`, { status });
   }
 
   cancelOrder(orderId: number): Observable<Order> {
-    return this.http.put<Order>(`${this.apiUrl}/orders/${orderId}/status`, { status: 'Cancelled' });
+    return this.http.put<Order>(`${this.apiUrl}/orders/${orderId}/cancel`, {});
   }
 }

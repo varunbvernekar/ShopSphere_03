@@ -80,6 +80,9 @@ public class SecurityConfig {
                                                 .requestMatchers(org.springframework.http.HttpMethod.PUT,
                                                                 "/api/orders/*/status")
                                                 .authenticated()
+                                                .requestMatchers(org.springframework.http.HttpMethod.PUT,
+                                                                "/api/orders/*/cancel")
+                                                .authenticated()
 
                                                 // Admin-only Order Mutations (General Update)
                                                 .requestMatchers(org.springframework.http.HttpMethod.PUT,

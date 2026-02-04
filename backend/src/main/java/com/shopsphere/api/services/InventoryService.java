@@ -6,6 +6,8 @@ import com.shopsphere.api.dto.responseDTO.InventoryResponseDTO;
 public interface InventoryService {
     InventoryResponseDTO getInventory(String productId);
 
+    java.util.List<InventoryResponseDTO> getAllInventory();
+
     InventoryResponseDTO updateInventory(String productId, StockUpdateRequestDTO request);
 
     void reduceStock(String productId, Integer quantity); // For internal use by OrderService

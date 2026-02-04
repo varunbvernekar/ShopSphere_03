@@ -13,25 +13,22 @@ export class InventoryService {
   public lowStockCount$ = this.lowStockCountSubject.asObservable();
   private readonly inventoryApiUrl = 'http://localhost:8080/api/inventory';
 
-  constructor(
-    private http: HttpClient,
-    private productService: ProductService
-  ) {
+  constructor(private http: HttpClient) {
     this.refreshLowStockCount();
   }
 
-  getProducts(): Observable<Product[]> {
-    return this.productService.getProducts();
+  getAllInventory(): Observable<InventoryItem[]> {
+    return this.http.get<InventoryItem[]>(this.inventoryApiUrl);
   }
 
   refreshLowStockCount(): void {
-    this.getProducts().subscribe({
-      next: products => {
-        const count = products.filter(
-          p =>
-            typeof p.stockLevel === 'number' &&
-            typeof p.reorderThreshold === 'number' &&
-            p.stockLevel <= p.reorderThreshold
+    this.getAllInventory().subscribe({
+      next: items => {
+        const count = items.filter(
+          item =>
+            typeof item.quantity === 'number' &&
+            typeof item.reorderThreshold === 'number' &&
+            item.quantity <= item.reorderThreshold
         ).length;
         this.lowStockCountSubject.next(count);
       }
@@ -58,4 +55,12 @@ export class InventoryService {
       tap(() => this.refreshLowStockCount())
     );
   }
+}
+
+export interface InventoryItem {
+  productId: string;
+  productName: string;
+  productPrice: number;
+  quantity: number;
+  reorderThreshold: number;
 }

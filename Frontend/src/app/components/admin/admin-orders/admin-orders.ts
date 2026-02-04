@@ -61,7 +61,7 @@ export class AdminOrders implements OnInit {
         const originalStatus = order.status;
         order.status = newStatus;
 
-        this.orderService.updateOrder(order).subscribe({
+        this.orderService.updateOrderStatus(order.id, newStatus).subscribe({
             next: (updated) => this.updateLocalOrder(updated),
             error: (err) => {
                 order.status = originalStatus;

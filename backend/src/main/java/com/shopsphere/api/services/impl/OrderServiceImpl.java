@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
 import java.util.stream.Collectors;
 
 import com.shopsphere.api.entity.Cart;
@@ -122,26 +122,33 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Optional<OrderResponseDTO> getOrderById(Long id) {
-        return orderRepository.findById(id)
-                .map(OrderResponseDTO::fromEntity);
+    @Transactional
+    public OrderResponseDTO updateOrderStatus(Long id, OrderStatus status) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Only allow delivery-related status updates (e.g., Shipped, Delivered)
+        // Cancellation is handled by cancelOrder
+        if (status == OrderStatus.Cancelled) {
+            throw new RuntimeException("Use cancelOrder to cancel orders.");
+        }
+
+        order.setStatus(status);
+        Order savedOrder = orderRepository.save(order);
+        return OrderResponseDTO.fromEntity(savedOrder);
     }
 
     @Override
     @Transactional
-    public OrderResponseDTO updateOrderStatus(Long id, OrderStatus status) {
+    public OrderResponseDTO cancelOrder(Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         OrderStatus currentStatus = order.getStatus();
 
         // Security Check
-        Authentication auth = SecurityContextHolder
-                .getContext().getAuthentication();
-
-        boolean isAdmin = auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
         if (!isAdmin) {
             // CUSTOMER RULES
@@ -152,111 +159,32 @@ public class OrderServiceImpl implements OrderService {
             if (!order.getUserId().equals(user.getId())) {
                 throw new RuntimeException("Access Denied: You do not own this order.");
             }
+        }
 
-            if (status != OrderStatus.Cancelled) {
-                throw new RuntimeException("Customers can only cancel orders.");
-            }
+        // Cancellation Rules (Same for Admin & Customer for now, based on state)
+        if (currentStatus == OrderStatus.Shipped || currentStatus == OrderStatus.Delivered) {
+            throw new RuntimeException("Cannot cancel order that has already been shipped or delivered.");
+        }
 
-            if (currentStatus != OrderStatus.Placed && currentStatus != OrderStatus.Confirmed
-                    && currentStatus != OrderStatus.Packed) {
-                throw new RuntimeException("You cannot cancel an order that has already been shipped or delivered.");
-            }
-        } else {
-            // ADMIN RULES
-            if (status == OrderStatus.Cancelled) {
-                if (currentStatus == OrderStatus.Shipped || currentStatus == OrderStatus.Delivered) {
-                    throw new RuntimeException("Cannot cancel order that has already been shipped or delivered.");
-                }
-            } else {
-                // Enforce Valid Transitions
-                boolean isValid = false;
-                switch (currentStatus) {
-                    case Placed:
-                        if (status == OrderStatus.Confirmed)
-                            isValid = true;
-                        break;
-                    case Confirmed:
-                        if (status == OrderStatus.Packed)
-                            isValid = true;
-                        break;
-                    case Packed:
-                        if (status == OrderStatus.Shipped)
-                            isValid = true;
-                        break;
-                    case Shipped:
-                        if (status == OrderStatus.Delivered)
-                            isValid = true;
-                        break;
-                    default:
-                        break;
-                }
-                if (!isValid) {
-                    throw new RuntimeException("Invalid status transition from " + currentStatus + " to " + status);
-                }
-            }
+        if (currentStatus == OrderStatus.Cancelled) {
+            throw new RuntimeException("Order is already cancelled.");
         }
 
         // Logic for Cancellation (Restore Stock)
-        if (status == OrderStatus.Cancelled && currentStatus != OrderStatus.Cancelled) {
-            if (order.getItems() != null) {
-                for (var item : order.getItems()) {
-                    if (item.getProductId() != null) {
-                        try {
-                            inventoryService.increaseStock(item.getProductId(), item.getQuantity());
-                        } catch (Exception e) {
-                            // Log error but generally proceed or throw?
-                            // Safer to throw to ensure transaction rollback if stock can't be restored
-                            throw new RuntimeException("Failed to restore stock for product: " + item.getProductId(),
-                                    e);
-                        }
+        if (order.getItems() != null) {
+            for (var item : order.getItems()) {
+                if (item.getProductId() != null) {
+                    try {
+                        inventoryService.increaseStock(item.getProductId(), item.getQuantity());
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to restore stock for product: " + item.getProductId(), e);
                     }
                 }
             }
         }
 
-        order.setStatus(status);
+        order.setStatus(OrderStatus.Cancelled);
         Order savedOrder = orderRepository.save(order);
-        return OrderResponseDTO.fromEntity(savedOrder);
-    }
-
-    @Override
-    @Transactional
-    public OrderResponseDTO updateOrder(Long id, OrderRequestDTO orderRequest) {
-        Order existing = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
-
-        existing.setDeliveryAddress(orderRequest.getDeliveryAddress());
-        existing.setEstimatedDelivery(orderRequest.getEstimatedDelivery());
-
-        // Note: Status updates should be done via updateOrderStatus or separate
-        // DeliveryService for logistics
-        // Keeping basic status update here for now if admin wants to force update
-        // without delivery logic
-        if (orderRequest.getStatus() != null) {
-            existing.setStatus(orderRequest.getStatus());
-        }
-
-        if (orderRequest.getItems() != null) {
-            List<OrderItem> newItems = orderRequest.getItems().stream()
-                    .map(itemDTO -> OrderItem.builder()
-                            .productId(itemDTO.getProductId())
-                            .name(itemDTO.getName())
-                            .image(itemDTO.getImage())
-                            .quantity(itemDTO.getQuantity())
-                            .color(itemDTO.getColor())
-                            .size(itemDTO.getSize())
-                            .material(itemDTO.getMaterial())
-                            .price(itemDTO.getPrice())
-                            .build())
-                    .collect(Collectors.toList());
-
-            existing.getItems().clear();
-            existing.getItems().addAll(newItems);
-        }
-
-        // REMOVED: Logistics update logic. Use DeliveryService for this.
-
-        Order savedOrder = orderRepository.save(existing);
         return OrderResponseDTO.fromEntity(savedOrder);
     }
 }

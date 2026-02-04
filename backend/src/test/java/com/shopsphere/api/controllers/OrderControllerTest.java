@@ -109,4 +109,16 @@ class OrderControllerTest {
         assertEquals(OrderStatus.Confirmed, response.getBody().getStatus());
         verify(orderService).updateOrderStatus(1L, OrderStatus.Confirmed);
     }
+
+    @Test
+    void cancelOrder_ShouldReturnCancelledOrder() {
+        orderResponse.setStatus(OrderStatus.Cancelled);
+        when(orderService.cancelOrder(1L)).thenReturn(orderResponse);
+
+        ResponseEntity<OrderResponseDTO> response = orderController.cancelOrder(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(OrderStatus.Cancelled, response.getBody().getStatus());
+        verify(orderService).cancelOrder(1L);
+    }
 }

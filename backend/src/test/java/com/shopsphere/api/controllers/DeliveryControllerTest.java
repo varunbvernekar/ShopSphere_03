@@ -1,7 +1,7 @@
 package com.shopsphere.api.controllers;
 
 import com.shopsphere.api.dto.requestDTO.LogisticsInfoRequestDTO;
-import com.shopsphere.api.dto.requestDTO.OrderStatusUpdateRequestDTO;
+
 import com.shopsphere.api.dto.responseDTO.OrderResponseDTO;
 import com.shopsphere.api.enums.OrderStatus;
 import com.shopsphere.api.services.DeliveryService;
@@ -32,7 +32,6 @@ class DeliveryControllerTest {
 
     private OrderResponseDTO orderResponse;
     private LogisticsInfoRequestDTO logisticsRequest;
-    private OrderStatusUpdateRequestDTO statusUpdateRequest;
 
     @BeforeEach
     void setUp() {
@@ -45,8 +44,6 @@ class DeliveryControllerTest {
         logisticsRequest.setCarrier("DHL");
         logisticsRequest.setTrackingId("12345"); // Changed from setTrackingNumber
 
-        statusUpdateRequest = new OrderStatusUpdateRequestDTO();
-        statusUpdateRequest.setStatus(OrderStatus.Shipped);
     }
 
     @Test
@@ -59,17 +56,5 @@ class DeliveryControllerTest {
         assertNotNull(response.getBody());
         assertEquals(OrderStatus.Shipped, response.getBody().getStatus());
         verify(deliveryService).updateLogistics(1L, logisticsRequest);
-    }
-
-    @Test
-    void updateDeliveryStatus_ShouldReturnUpdatedOrder() {
-        when(deliveryService.updateStatus(eq(1L), eq(OrderStatus.Shipped))).thenReturn(orderResponse);
-
-        ResponseEntity<OrderResponseDTO> response = deliveryController.updateDeliveryStatus(1L, statusUpdateRequest);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(OrderStatus.Shipped, response.getBody().getStatus());
-        verify(deliveryService).updateStatus(1L, OrderStatus.Shipped);
     }
 }
