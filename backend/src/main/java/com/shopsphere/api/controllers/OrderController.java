@@ -10,12 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.shopsphere.api.dto.requestDTO.OrderStatusUpdateRequestDTO;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class OrderController {
 
     private final OrderService orderService;
@@ -29,8 +33,7 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<List<OrderResponseDTO>> getOrders(@RequestParam(required = false) Long userId) {
-        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
@@ -48,7 +51,7 @@ public class OrderController {
 
     @PutMapping("/{id}/status")
     public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable Long id,
-            @RequestBody com.shopsphere.api.dto.requestDTO.OrderStatusUpdateRequestDTO request) {
+            @RequestBody OrderStatusUpdateRequestDTO request) {
         log.info("Updating status for order ID: {} to {}", id, request.getStatus());
         return ResponseEntity.ok(orderService.updateOrderStatus(id, request.getStatus()));
     }

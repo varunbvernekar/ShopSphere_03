@@ -18,8 +18,5 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/api/uploads/**")
                 .addResourceLocations("file:" + absolutePath + "/");
 
-        // Legacy support for /api/v1 images
-        registry.addResourceHandler("/api/v1/uploads/**")
-                .addResourceLocations("file:" + absolutePath + "/");
     }
 }

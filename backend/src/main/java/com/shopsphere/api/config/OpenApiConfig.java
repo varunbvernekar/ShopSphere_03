@@ -11,17 +11,17 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 @Configuration
 public class OpenApiConfig {
 
-    @Bean
-    public OpenAPI usersMicroserviceOpenAPI() {
-        return new OpenAPI()
-                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
-                .components(new Components().addSecuritySchemes("Bearer Authentication",
-                        new SecurityScheme()
-                                .type(SecurityScheme.Type.HTTP)
-                                .bearerFormat("JWT")
-                                .scheme("bearer")))
-                .info(new Info().title("ShopSphere API")
-                        .description("Backend API for ShopSphere E-commerce Platform")
-                        .version("1.0"));
-    }
+        @Bean
+        public OpenAPI customOpenAPI() {
+                return new OpenAPI()
+                                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
+                                .components(new Components().addSecuritySchemes("Bearer Authentication",
+                                                new SecurityScheme()
+                                                                .type(SecurityScheme.Type.HTTP)
+                                                                .bearerFormat("JWT")
+                                                                .scheme("bearer")))
+                                .info(new Info().title("ShopSphere API")
+                                                .description("Backend API for ShopSphere E-commerce Platform")
+                                                .version("1.0"));
+        }
 }

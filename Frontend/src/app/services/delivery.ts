@@ -15,8 +15,6 @@ export class DeliveryService {
     return this.http.put<Order>(`${this.apiUrl}/${orderId}/logistics`, logistics);
   }
 
-
-
   getTrackingUrl(carrier: string, trackingId: string): string {
     const c = carrier.toLowerCase();
     if (c.includes('shiprocket') || c.includes('delhivery')) return `https://www.shiprocket.in/tracking/${trackingId}`;

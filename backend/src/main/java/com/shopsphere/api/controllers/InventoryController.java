@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/inventory")
 @RequiredArgsConstructor
@@ -17,16 +19,11 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<java.util.List<InventoryResponseDTO>> getInventory() {
+    public ResponseEntity<List<InventoryResponseDTO>> getInventory() {
         log.info("Fetching all inventory");
         return ResponseEntity.ok(inventoryService.getAllInventory());
-    }
-
-    @GetMapping("/{productId}")
-    public ResponseEntity<InventoryResponseDTO> getInventory(@PathVariable String productId) {
-        log.info("Fetching inventory for product ID: {}", productId);
-        return ResponseEntity.ok(inventoryService.getInventory(productId));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

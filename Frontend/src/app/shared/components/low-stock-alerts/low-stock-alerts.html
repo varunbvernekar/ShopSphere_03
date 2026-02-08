@@ -22,10 +22,10 @@
       <div class="low-stock-list" *ngIf="lowStockProducts.length > 0">
         <div class="low-stock-item" *ngFor="let p of lowStockProducts">
           <div class="low-stock-info">
-            <div class="low-stock-name">{{ p.name }}</div>
+            <div class="low-stock-name">{{ p.productName }}</div>
             <div class="low-stock-meta">
               Stock:
-              <span class="stock-value">{{ p.stockLevel }} units</span>
+              <span class="stock-value">{{ p.quantity }} units</span>
               &nbsp; (Threshold:
               <span class="threshold-value">{{ p.reorderThreshold }}</span>)
             </div>

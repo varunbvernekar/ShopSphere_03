@@ -1,13 +1,12 @@
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
-import { Product } from '../models/product';
-import { ProductService } from './product';
+import { InventoryItem } from '../models/inventory-item';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class InventoryService {
   private lowStockCountSubject = new BehaviorSubject<number>(0);
   public lowStockCount$ = this.lowStockCountSubject.asObservable();
@@ -35,20 +34,6 @@ export class InventoryService {
     });
   }
 
-  updateStock(productId: string, stockLevel: number): Observable<any> {
-    const payload = { quantity: stockLevel };
-    return this.http.put(`${this.inventoryApiUrl}/${productId}`, payload).pipe(
-      tap(() => this.refreshLowStockCount())
-    );
-  }
-
-  updateReorderThreshold(productId: string, reorderThreshold: number): Observable<any> {
-    const payload = { threshold: reorderThreshold };
-    return this.http.put(`${this.inventoryApiUrl}/${productId}`, payload).pipe(
-      tap(() => this.refreshLowStockCount())
-    );
-  }
-
   updateInventory(productId: string, stockLevel: number, reorderThreshold: number): Observable<any> {
     const payload = { quantity: stockLevel, threshold: reorderThreshold };
     return this.http.put(`${this.inventoryApiUrl}/${productId}`, payload).pipe(
@@ -57,10 +42,4 @@ export class InventoryService {
   }
 }
 
-export interface InventoryItem {
-  productId: string;
-  productName: string;
-  productPrice: number;
-  quantity: number;
-  reorderThreshold: number;
-}
+

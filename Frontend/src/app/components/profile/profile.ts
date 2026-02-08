@@ -13,12 +13,10 @@ import { UserService } from '../../services/user';
   styleUrls: ['./profile.css']
 })
 export class Profile implements OnInit {
+
   user: User | null = null;
-  originalUser: User | null = null;
   isLoading = false;
-  isSaving = false;
-  errorMessage = '';
-  successMessage = '';
+  message = '';
 
   constructor(
     private authService: AuthService,
@@ -29,124 +27,45 @@ export class Profile implements OnInit {
     this.loadProfile();
   }
 
+  // Load User Profile
   loadProfile(): void {
     const currentUser = this.authService.getCurrentUser();
 
     if (!currentUser || !currentUser.id) {
+      this.message = "User not logged in!";
       return;
     }
 
     this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
 
     this.userService.getUser(currentUser.id).subscribe({
-      next: user => {
-        const completeUser: User = {
-          ...user,
-          phoneNumber: user.phoneNumber || '',
-          dateOfBirth: user.dateOfBirth || '',
-          gender: user.gender || '',
-          address: user.address || {
-            street: '',
-            city: '',
-            state: '',
-            zipCode: '',
-            country: ''
-          }
-        };
-
-        this.user = completeUser;
-        this.originalUser = JSON.parse(JSON.stringify(completeUser));
+      next: (data) => {
+        this.user = data;
+        if (!this.user.address) {
+          this.user.address = { street: '', city: '', state: '', zipCode: '', country: '' };
+        }
         this.isLoading = false;
       },
-      error: err => {
-        if (err.status === 0) {
-          this.errorMessage = 'Unable to connect to the server. Please ensure the backend is running.';
-          this.isLoading = false;
-          return;
-        }
-        if (err.status === 404) {
-          const currentUser = this.authService.getCurrentUser();
-          if (currentUser) {
-            const completeUser: User = {
-              ...currentUser,
-              phoneNumber: currentUser.phoneNumber || '',
-              dateOfBirth: currentUser.dateOfBirth || '',
-              gender: currentUser.gender || ''
-            };
-            this.user = completeUser;
-            this.originalUser = JSON.parse(JSON.stringify(completeUser));
-            this.isLoading = false;
-            return;
-          }
-        }
-        this.errorMessage = 'Failed to load profile. Please try again.';
+      error: () => {
+        this.message = "Failed to load profile!";
         this.isLoading = false;
       }
     });
   }
 
+  //  Update Profile
   onSubmit(): void {
-    if (!this.user || !this.user.id) {
-      this.errorMessage = 'User data is invalid.';
-      return;
-    }
+    if (!this.user) return;
 
-    this.isSaving = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    const userToSave: User = {
-      ...this.user,
-      phoneNumber: this.user.phoneNumber || '',
-      dateOfBirth: this.user.dateOfBirth || '',
-      gender: this.user.gender || ''
-    };
-
-    this.userService.updateUser(userToSave).subscribe({
-      next: updatedUser => {
-        const completeUser: User = {
-          ...updatedUser,
-          phoneNumber: updatedUser.phoneNumber || '',
-          dateOfBirth: updatedUser.dateOfBirth || '',
-          gender: updatedUser.gender || '',
-          address: updatedUser.address || {
-            street: '',
-            city: '',
-            state: '',
-            zipCode: '',
-            country: ''
-          }
-        };
-
-        this.authService.updateCurrentUser(completeUser);
-        this.user = completeUser;
-        this.originalUser = JSON.parse(JSON.stringify(completeUser));
-        this.successMessage = 'Profile updated successfully!';
-        this.isSaving = false;
-
-        setTimeout(() => {
-          this.successMessage = '';
-        }, 3000);
+    this.userService.updateUser(this.user).subscribe({
+      next: (updatedUser) => {
+        this.user = updatedUser;
+        this.authService.updateCurrentUser(updatedUser);
+        this.message = "Profile updated successfully!";
       },
-      error: err => {
-        console.error('Failed to update profile', err);
-        if (err.status === 0) {
-          this.errorMessage = 'Unable to connect to the server. Please ensure the backend is running.';
-        } else {
-          this.errorMessage = 'Failed to update profile. Please try again.';
-        }
-        this.isSaving = false;
+      error: () => {
+        this.message = "Update failed. Try again!";
       }
     });
-  }
-
-  resetForm(): void {
-    if (this.originalUser) {
-      this.user = JSON.parse(JSON.stringify(this.originalUser));
-      this.errorMessage = '';
-      this.successMessage = '';
-    }
   }
 }

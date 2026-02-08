@@ -2,8 +2,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Product } from '../../../models/product';
-import { ProductService } from '../../../services/product';
+import { InventoryItem } from '../../../models/inventory-item';
 import { InventoryService } from '../../../services/inventory';
 import { Subscription } from 'rxjs';
 
@@ -18,11 +17,11 @@ export class LowStockAlerts implements OnInit, OnDestroy, OnChanges {
   @Input() isOpen: boolean = false;
   @Output() closeEvent = new EventEmitter<void>();
 
-  lowStockProducts: Product[] = [];
-  private productsSubscription?: Subscription;
+  lowStockProducts: InventoryItem[] = [];
+  private subscription?: Subscription;
 
   constructor(
-    private productService: ProductService,
+    private inventoryService: InventoryService,
     private router: Router
   ) { }
 
@@ -33,8 +32,8 @@ export class LowStockAlerts implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnDestroy(): void {
-    if (this.productsSubscription) {
-      this.productsSubscription.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
     }
   }
 
@@ -45,13 +44,13 @@ export class LowStockAlerts implements OnInit, OnDestroy, OnChanges {
   }
 
   loadLowStockProducts(): void {
-    this.productsSubscription = this.productService.getProducts().subscribe({
-      next: products => {
-        this.lowStockProducts = products.filter(
-          p =>
-            typeof p.stockLevel === 'number' &&
-            typeof p.reorderThreshold === 'number' &&
-            p.stockLevel <= p.reorderThreshold
+    this.subscription = this.inventoryService.getAllInventory().subscribe({
+      next: items => {
+        this.lowStockProducts = items.filter(
+          item =>
+            typeof item.quantity === 'number' &&
+            typeof item.reorderThreshold === 'number' &&
+            item.quantity <= item.reorderThreshold
         );
       },
       error: err => {
@@ -64,7 +63,7 @@ export class LowStockAlerts implements OnInit, OnDestroy, OnChanges {
     this.closeEvent.emit();
   }
 
-  goToInventory(product: Product): void {
+  goToInventory(item: InventoryItem): void {
     this.close();
     this.router.navigate(['/admin/inventory']);
   }

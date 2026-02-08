@@ -15,5 +15,5 @@ public interface ProductService {
     ProductResponseDTO updateProduct(String id, ProductRequestDTO productRequest);
 
     void deleteProduct(String id);
-    // Removed direct stock update methods, now handled by InventoryService
+
 }

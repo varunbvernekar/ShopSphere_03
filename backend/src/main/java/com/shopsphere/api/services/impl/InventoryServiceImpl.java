@@ -8,13 +8,14 @@ import com.shopsphere.api.services.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.shopsphere.api.repositories.ProductRepository;
 
 @Service
 @RequiredArgsConstructor
 public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
-    private final com.shopsphere.api.repositories.ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public InventoryResponseDTO getInventory(String productId) {
@@ -98,6 +99,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional
     public void deleteInventory(String productId) {
+
         inventoryRepository.deleteByProductId(productId);
     }
 

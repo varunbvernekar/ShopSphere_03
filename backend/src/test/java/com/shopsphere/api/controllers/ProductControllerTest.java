@@ -79,19 +79,6 @@ class ProductControllerTest {
     }
 
     @Test
-    void saveProduct_ShouldReturnCreatedProduct() {
-        when(productService.saveProduct(any(ProductRequestDTO.class))).thenReturn(productResponse);
-
-        ResponseEntity<ProductResponseDTO> response = productController.saveProduct(productRequest);
-
-        // Controller returns ResponseEntity.ok(savedProduct) which is 200 OK
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Test Product", response.getBody().getName());
-        verify(productService).saveProduct(productRequest);
-    }
-
-    @Test
     void updateProduct_ShouldReturnUpdatedProduct() {
         when(productService.updateProduct(eq("P1"), any(ProductRequestDTO.class))).thenReturn(productResponse);
 

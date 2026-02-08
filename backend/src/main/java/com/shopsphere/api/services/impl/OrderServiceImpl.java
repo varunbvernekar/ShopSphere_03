@@ -10,12 +10,9 @@ import com.shopsphere.api.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
 import java.util.stream.Collectors;
-
 import com.shopsphere.api.entity.Cart;
 import com.shopsphere.api.entity.LogisticsInfo;
 import com.shopsphere.api.entity.OrderItem;
@@ -127,8 +124,6 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        // Only allow delivery-related status updates (e.g., Shipped, Delivered)
-        // Cancellation is handled by cancelOrder
         if (status == OrderStatus.Cancelled) {
             throw new RuntimeException("Use cancelOrder to cancel orders.");
         }

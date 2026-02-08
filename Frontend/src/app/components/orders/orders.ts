@@ -66,12 +66,6 @@ export class OrdersPage implements OnInit {
     this.selectedOrder = order;
   }
 
-  /**
-   * Requests order cancellation.
-   * Backend (OrderServiceImpl) enforces rules:
-   * - Customer can only cancel 'Placed', 'Confirmed', or 'Packed' orders.
-   * - Stock is automatically restored.
-   */
   cancelOrder(order: Order): void {
     if (!this.canCancel(order)) {
       console.log('This order cannot be cancelled.');

@@ -6,8 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import com.shopsphere.api.services.InventoryService;
+import com.shopsphere.api.services.ProductService;
+import com.shopsphere.api.services.FileStorageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/products")
@@ -16,10 +21,10 @@ import java.util.List;
 @lombok.extern.slf4j.Slf4j
 public class ProductController {
 
-    private final com.shopsphere.api.services.ProductService productService;
-    private final com.shopsphere.api.services.FileStorageService fileStorageService;
-    private final com.shopsphere.api.services.InventoryService inventoryService;
-    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+    private final ProductService productService;
+    private final FileStorageService fileStorageService;
+    private final InventoryService inventoryService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
@@ -47,8 +52,8 @@ public class ProductController {
     @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<ProductResponseDTO> createProductWithImage(
             @RequestPart("product") String productJson,
-            @RequestPart(value = "image", required = false) org.springframework.web.multipart.MultipartFile image)
-            throws java.io.IOException {
+            @RequestPart(value = "image", required = false) MultipartFile image)
+            throws IOException {
         log.info("Creating product with possible image upload");
         ProductRequestDTO productRequest = objectMapper.readValue(productJson, ProductRequestDTO.class);
 
@@ -58,22 +63,6 @@ public class ProductController {
             log.info("Image uploaded and saved to: {}", imagePath);
         }
 
-        ProductResponseDTO savedProduct = productService.saveProduct(productRequest);
-
-        // Handle Inventory
-        inventoryService.initializeInventory(savedProduct.getProductId(),
-                productRequest.getStockLevel(),
-                productRequest.getReorderThreshold());
-
-        populateInventoryData(savedProduct);
-        log.info("Product created successfully with ID: {}", savedProduct.getProductId());
-        return ResponseEntity.ok(savedProduct);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
-    public ResponseEntity<ProductResponseDTO> saveProduct(@RequestBody ProductRequestDTO productRequest) {
-        log.info("Creating product without image upload");
         ProductResponseDTO savedProduct = productService.saveProduct(productRequest);
 
         // Handle Inventory
@@ -101,15 +90,6 @@ public class ProductController {
             @RequestBody ProductRequestDTO productRequest) {
         log.info("Updating product ID: {}", id);
         ProductResponseDTO updatedProduct = productService.updateProduct(id, productRequest);
-
-        // Handle Inventory Update if provided
-        if (productRequest.getStockLevel() != null || productRequest.getReorderThreshold() != null) {
-            com.shopsphere.api.dto.requestDTO.StockUpdateRequestDTO stockUpdate = new com.shopsphere.api.dto.requestDTO.StockUpdateRequestDTO();
-            stockUpdate.setQuantity(productRequest.getStockLevel());
-            stockUpdate.setThreshold(productRequest.getReorderThreshold());
-            inventoryService.updateInventory(id, stockUpdate);
-        }
-
         populateInventoryData(updatedProduct);
         return ResponseEntity.ok(updatedProduct);
     }

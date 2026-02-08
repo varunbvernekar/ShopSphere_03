@@ -4,9 +4,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductService } from '../../../services/product';
-import { Product } from '../../../models/product';
-
-import { DEFAULT_CUSTOM_OPTIONS } from '../../../config/product.config';
 
 @Component({
     selector: 'app-admin-add-product',
@@ -47,7 +44,7 @@ export class AdminAddProduct {
             basePrice: Number(this.newProduct.basePrice),
             stockLevel: Number(this.newProduct.stockLevel),
             reorderThreshold: Number(this.newProduct.reorderThreshold),
-            customOptions: [], // Using empty options as per user request
+            customOptions: [], // Using empty options 
             isActive: true
         };
 

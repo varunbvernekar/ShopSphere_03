@@ -18,7 +18,6 @@ export class Register {
   email = '';
   phoneNumber = '';
   password = '';
-  confirmPassword = '';
   dateOfBirth = '';
   gender = '';
 

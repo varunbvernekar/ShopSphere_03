@@ -8,13 +8,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.shopsphere.api.dto.responseDTO.ProductSalesDTO;
+import lombok.extern.slf4j.Slf4j;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/dashboard")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class DashboardController {
 
     private final DashboardService dashboardService;
@@ -28,8 +32,8 @@ public class DashboardController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/products/top-selling")
-    public ResponseEntity<java.util.List<com.shopsphere.api.dto.responseDTO.ProductSalesDTO>> getTopSellingProducts(
-            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "5") int limit) {
+    public ResponseEntity<List<ProductSalesDTO>> getTopSellingProducts(
+            @RequestParam(defaultValue = "5") int limit) {
         return ResponseEntity.ok(dashboardService.getTopSellingProducts(limit));
     }
 }

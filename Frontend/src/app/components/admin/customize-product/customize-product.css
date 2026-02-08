@@ -62,17 +62,13 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Fill the box completely, cropping if necessary */
     padding: 0;
-    /* Remove padding to fill the edge */
     transition: transform 0.3s ease;
-    /* Add padding so it doesn't touch edges */
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
 }
 
 .product-card:hover .product-image img {
     transform: scale(1.05);
-    /* Subtle zoom on hover */
 }
 
 .product-details {

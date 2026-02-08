@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { Title } from '@angular/platform-browser';
+
 import { CartService } from '../../../services/cart';
 import { Cart } from '../../../models/cart';
 
@@ -14,10 +14,11 @@ import { Cart } from '../../../models/cart';
 })
 export class CartPage implements OnInit {
     cart: Cart | null = null;
-    constructor(public cartService: CartService, private router: Router, private titleService: Title) { }
+    constructor(public cartService: CartService,
+        private router: Router) { }
 
     ngOnInit(): void {
-        this.titleService.setTitle('Shopping Cart - ShopSphere');
+
         this.loadCart();
     }
 

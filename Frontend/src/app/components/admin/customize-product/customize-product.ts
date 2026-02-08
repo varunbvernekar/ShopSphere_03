@@ -18,7 +18,6 @@ export class CustomizeProduct implements OnInit {
 
     selectedProduct: Product | null = null;
     editingOptions: CustomOptionGroup[] = [];
-
     newOptionType: CustomOptionType = 'colour';
     newOptionValue = '';
     newOptionPrice = 0;

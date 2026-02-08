@@ -9,12 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/delivery")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class DeliveryController {
 
     private final DeliveryService deliveryService;

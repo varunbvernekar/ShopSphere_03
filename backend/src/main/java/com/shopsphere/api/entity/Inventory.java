@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -28,11 +26,4 @@ public class Inventory {
     @Column(nullable = false)
     private Integer reorderThreshold;
 
-    private LocalDateTime lastUpdated;
-
-    @PrePersist
-    @PreUpdate
-    public void updateTimestamp() {
-        this.lastUpdated = LocalDateTime.now();
-    }
 }

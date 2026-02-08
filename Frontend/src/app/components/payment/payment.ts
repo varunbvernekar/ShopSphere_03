@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth';
 import { OrderService } from '../../services/order';
 import { ProductService } from '../../services/product';
 import { InventoryService } from '../../services/inventory';
+import { UserService } from '../../services/user';
 import { Order, OrderStatus, Address } from '../../models/order';
 import { Cart } from '../../models/cart';
 import { CartItem } from '../../models/cart-item';
@@ -61,6 +62,7 @@ export class Payment implements OnInit {
   constructor(
     private cartService: CartService,
     private authService: AuthService,
+    private userService: UserService,
     private orderService: OrderService,
     private productService: ProductService,
     private inventoryService: InventoryService,
@@ -86,9 +88,22 @@ export class Payment implements OnInit {
       error: () => this.router.navigate(['/products'])
     });
 
-    // Pre-fill address if user has one
-    if (user.address) {
-      this.address = { ...user.address };
+    // Fetch latest user profile to pre-fill address
+    if (user.id) {
+      this.userService.getUser(user.id).subscribe({
+        next: (userData) => {
+          if (userData.address) {
+            this.address = { ...userData.address };
+          }
+        },
+        error: (err) => {
+          console.error('Failed to fetch user profile for address pre-fill', err);
+          // Fallback to cached user address if fresh fetch fails
+          if (user.address) {
+            this.address = { ...user.address };
+          }
+        }
+      });
     }
   }
 

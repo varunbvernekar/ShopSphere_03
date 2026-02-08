@@ -25,26 +25,23 @@
 }
 
 .loading,
-.error-message {
+.alert-message {
   padding: 24px;
   text-align: center;
   color: #6b7280;
 }
 
-.error-message {
-  color: #ef4444;
-  background: #fef2f2;
+.alert-message {
+  color: #065f46;
+  background: #d1fae5;
   border-radius: 12px;
   margin-bottom: 24px;
+  font-size: 14px;
 }
 
-.success-message {
-  padding: 12px 16px;
-  background: #d1fae5;
-  color: #065f46;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  font-size: 14px;
+.alert-message.error {
+  color: #ef4444;
+  background: #fef2f2;
 }
 
 .profile-content {
@@ -114,19 +111,6 @@
   cursor: not-allowed;
 }
 
-.address-section {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.section-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #111827;
-}
-
 .form-actions {
   display: flex;
   gap: 12px;
@@ -159,22 +143,6 @@
   transform: none;
 }
 
-.btn-secondary {
-  background: #f3f4f6;
-  color: #374151;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-secondary:hover {
-  background: #e5e7eb;
-}
-
 @media (max-width: 768px) {
   .profile-page {
     padding: 24px 16px;
@@ -192,9 +160,7 @@
     flex-direction: column;
   }
 
-  .btn-primary,
-  .btn-secondary {
+  .btn-primary {
     width: 100%;
   }
 }
-

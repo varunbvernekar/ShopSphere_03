@@ -15,12 +15,11 @@ import java.util.function.Function;
 @Component
 public class JwtUtils {
 
-    // In production, store this in application.properties
-    private static final String SECRET = "your_very_secret_key_should_be_long_enough_256_bits_at_least";
-    private static final long EXPIRATION_TIME = 86400000; // 24 hours
+    // Secure 256-bit key for HS256
+    private static final String SECRET = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+    private static final long EXPIRATION_TIME = 36000000; // 10 hours
 
     private Key getSigningKey() {
-        // Use a secure key, here generating from the string
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 

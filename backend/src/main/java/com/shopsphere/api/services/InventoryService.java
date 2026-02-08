@@ -2,11 +2,12 @@ package com.shopsphere.api.services;
 
 import com.shopsphere.api.dto.requestDTO.StockUpdateRequestDTO;
 import com.shopsphere.api.dto.responseDTO.InventoryResponseDTO;
+import java.util.List;
 
 public interface InventoryService {
     InventoryResponseDTO getInventory(String productId);
 
-    java.util.List<InventoryResponseDTO> getAllInventory();
+    List<InventoryResponseDTO> getAllInventory();
 
     InventoryResponseDTO updateInventory(String productId, StockUpdateRequestDTO request);
 

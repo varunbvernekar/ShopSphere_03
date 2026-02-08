@@ -4,7 +4,8 @@ import com.shopsphere.api.dto.requestDTO.LoginRequestDTO;
 import com.shopsphere.api.dto.requestDTO.RegisterRequestDTO;
 import com.shopsphere.api.dto.responseDTO.AuthResponseDTO;
 import com.shopsphere.api.dto.responseDTO.UserResponseDTO;
-import com.shopsphere.api.entity.User;
+
+import com.shopsphere.api.security.JwtUtils;
 import com.shopsphere.api.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
-    private final com.shopsphere.api.security.JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@RequestBody RegisterRequestDTO request) {

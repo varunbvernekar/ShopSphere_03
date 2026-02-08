@@ -33,7 +33,7 @@ export class AdminDashboard implements OnInit {
   // Reports
   orders: Order[] = [];
   filteredOrders: Order[] = [];
-  repeatedProductsReport: any[] = []; // Using any to match service response or interface
+  repeatedProductsReport: any[] = [];
 
   showReports = true;
   reportStartDate = '';

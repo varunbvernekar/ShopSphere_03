@@ -59,7 +59,6 @@ export class AdminInventory implements OnInit {
       }
     });
   }
-
   // Search & Filter Logic
   onSearchChange(): void {
     this.filterProducts();
@@ -91,6 +90,7 @@ export class AdminInventory implements OnInit {
 
     this.filteredProducts = temp;
   }
+
 
   private isLowStock(product: Product): boolean {
     return (

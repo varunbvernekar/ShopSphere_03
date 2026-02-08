@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Product, CustomOptionGroup } from '../models/product';
-import { Observable, map, switchMap } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { DEFAULT_CUSTOM_OPTIONS } from '../config/product.config';
 
 @Injectable({
@@ -28,9 +28,9 @@ export class ProductService {
     );
   }
 
-  getProductById(productId: string): Observable<Product | undefined> {
-    return this.getProducts().pipe(
-      map(products => products.find(p => p.productId === productId))
+  getProductById(productId: string): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/products/${productId}`).pipe(
+      map(p => this.normalizeProduct(p))
     );
   }
 

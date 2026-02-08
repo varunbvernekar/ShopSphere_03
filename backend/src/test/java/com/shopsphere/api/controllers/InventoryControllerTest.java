@@ -45,16 +45,15 @@ class InventoryControllerTest {
     }
 
     @Test
-    void getInventory_ShouldReturnInventory() {
-        when(inventoryService.getInventory("P1")).thenReturn(inventoryResponse);
+    void getInventory_ShouldReturnAllInventory() {
+        when(inventoryService.getAllInventory()).thenReturn(java.util.List.of(inventoryResponse));
 
-        ResponseEntity<InventoryResponseDTO> response = inventoryController.getInventory("P1");
+        ResponseEntity<java.util.List<InventoryResponseDTO>> response = inventoryController.getInventory();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("P1", response.getBody().getProductId());
-        assertEquals(100, response.getBody().getQuantity());
-        verify(inventoryService).getInventory("P1");
+        assertEquals(1, response.getBody().size());
+        verify(inventoryService).getAllInventory();
     }
 
     @Test
